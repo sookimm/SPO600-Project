@@ -1,0 +1,17 @@
+insn-enums.o: insn-enums.cc config.h auto-host.h \
+ ../../src/gcc/../include/ansidecl.h ../../src/gcc/system.h \
+ ../../src/gcc/../include/safe-ctype.h \
+ ../../src/gcc/../include/filenames.h ../../src/gcc/../include/hashtab.h \
+ ../../src/gcc/../include/ansidecl.h ../../src/gcc/../include/libiberty.h \
+ ../../src/gcc/hwint.h insn-constants.h
+config.h:
+auto-host.h:
+../../src/gcc/../include/ansidecl.h:
+../../src/gcc/system.h:
+../../src/gcc/../include/safe-ctype.h:
+../../src/gcc/../include/filenames.h:
+../../src/gcc/../include/hashtab.h:
+../../src/gcc/../include/ansidecl.h:
+../../src/gcc/../include/libiberty.h:
+../../src/gcc/hwint.h:
+insn-constants.h:

@@ -1,0 +1,5 @@
+graphite-optimize-isl.o: ../../src/gcc/graphite-optimize-isl.cc config.h \
+ auto-host.h ../../src/gcc/../include/ansidecl.h
+config.h:
+auto-host.h:
+../../src/gcc/../include/ansidecl.h:

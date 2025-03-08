@@ -1836,11 +1836,11 @@ OBJS = \
 	web.o \
 	wide-int.o \
 	wide-int-print.o \
+	tree-skim.o \
 	$(out_object_file) \
 	$(ANALYZER_OBJS) \
 	$(EXTRA_OBJS) \
-        tree-skim.o \
-	$(host_hook_obj)
+	$(host_hook_obj) 
 
 # Objects in libcommon.a, potentially used by all host binaries and with
 # no target dependencies.

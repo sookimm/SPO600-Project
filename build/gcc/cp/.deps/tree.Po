@@ -1,0 +1,213 @@
+cp/tree.o: ../../src/gcc/cp/tree.cc config.h auto-host.h \
+ ../../src/gcc/../include/ansidecl.h ../../src/gcc/system.h \
+ ../../src/gcc/../include/safe-ctype.h \
+ ../../src/gcc/../include/filenames.h ../../src/gcc/../include/hashtab.h \
+ ../../src/gcc/../include/ansidecl.h ../../src/gcc/../include/libiberty.h \
+ ../../src/gcc/hwint.h ../../src/gcc/coretypes.h insn-modes.h \
+ ../../src/gcc/signop.h ../../src/gcc/wide-int.h \
+ ../../src/gcc/wide-int-print.h ../../src/gcc/poly-int.h \
+ ../../src/gcc/poly-int-types.h insn-modes-inline.h \
+ ../../src/gcc/machmode.h ../../src/gcc/mode-classes.def \
+ ../../src/gcc/double-int.h ../../src/gcc/align.h \
+ ../../src/gcc/iterator-utils.h ../../src/gcc/real.h \
+ ../../src/gcc/fixed-value.h ../../src/gcc/hash-table.h \
+ ../../src/gcc/statistics.h ../../src/gcc/ggc.h gtype-desc.h \
+ ../../src/gcc/vec.h ../../src/gcc/../include/hashtab.h \
+ ../../src/gcc/inchash.h ../../src/gcc/mem-stats-traits.h \
+ ../../src/gcc/hash-traits.h ../../src/gcc/hash-map-traits.h \
+ ../../src/gcc/mem-stats.h ../../src/gcc/hash-map.h \
+ ../../src/gcc/hash-set.h ../../src/gcc/input.h \
+ ../../src/gcc/../libcpp/include/line-map.h ../../src/gcc/is-a.h \
+ ../../src/gcc/memory-block.h ../../src/gcc/dumpfile.h \
+ ../../src/gcc/profile-count.h ../../src/gcc/tree.h \
+ ../../src/gcc/tree-core.h ../../src/gcc/../libcpp/include/symtab.h \
+ ../../src/gcc/../include/obstack.h all-tree.def ../../src/gcc/tree.def \
+ ../../src/gcc/c-family/c-common.def \
+ ../../src/gcc/ada/gcc-interface/ada-tree.def ../../src/gcc/c/c-tree.def \
+ ../../src/gcc/cp/cp-tree.def ../../src/gcc/d/d-tree.def \
+ ../../src/gcc/m2/m2-tree.def ../../src/gcc/objc/objc-tree.def \
+ ../../src/gcc/builtins.def ../../src/gcc/sync-builtins.def \
+ ../../src/gcc/omp-builtins.def ../../src/gcc/gtm-builtins.def \
+ ../../src/gcc/sanitizer.def ../../src/gcc/coroutine-builtins.def \
+ ../../src/gcc/internal-fn.def ../../src/gcc/treestruct.def options.h \
+ ../../src/gcc/flag-types.h ../../src/gcc/config/i386/i386-opts.h \
+ ../../src/gcc/config/i386/stringop.def tree-check.h \
+ ../../src/gcc/cp/cp-tree.h tm.h options.h insn-constants.h \
+ ../../src/gcc/config/vxworks-dummy.h \
+ ../../src/gcc/config/i386/biarch64.h ../../src/gcc/config/i386/i386.h \
+ ../../src/gcc/config/i386/x86-tune.def ../../src/gcc/wide-int-bitmask.h \
+ ../../src/gcc/config/i386/i386-isa.def insn-attr-common.h \
+ ../../src/gcc/common/config/i386/i386-cpuinfo.h \
+ ../../src/gcc/config/i386/unix.h ../../src/gcc/config/i386/att.h \
+ ../../src/gcc/config/elfos.h ../../src/gcc/config/gnu-user.h \
+ ../../src/gcc/config/glibc-stdint.h ../../src/gcc/config/i386/x86-64.h \
+ ../../src/gcc/config/i386/gnu-user-common.h \
+ ../../src/gcc/config/i386/gnu-user64.h ../../src/gcc/config/linux.h \
+ ../../src/gcc/config/linux-android.h \
+ ../../src/gcc/config/i386/linux-common.h \
+ ../../src/gcc/config/i386/linux64.h \
+ ../../src/gcc/config/initfini-array.h insn-flags.h insn-modes.h \
+ ../../src/gcc/defaults.h ../../src/gcc/hard-reg-set.h \
+ ../../src/gcc/array-traits.h ../../src/gcc/function.h \
+ ../../src/gcc/tristate.h ../../src/gcc/cp/contracts.h \
+ ../../src/gcc/c-family/c-common.h ../../src/gcc/../include/splay-tree.h \
+ ../../src/gcc/../libcpp/include/cpplib.h \
+ ../../src/gcc/../libcpp/include/symtab.h \
+ ../../src/gcc/../libcpp/include/line-map.h ../../src/gcc/alias.h \
+ ../../src/gcc/fold-const.h ../../src/gcc/diagnostic-core.h bversion.h \
+ ../../src/gcc/diagnostic.def ../../src/gcc/diagnostic.h \
+ ../../src/gcc/unique-argv.h \
+ ../../src/gcc/../libcpp/include/rich-location.h \
+ ../../src/gcc/../libcpp/include/label-text.h \
+ ../../src/gcc/pretty-print.h ../../src/gcc/diagnostic-url.h \
+ ../../src/gcc/diagnostic-core.h ../../src/gcc/cp/name-lookup.h \
+ ../../src/gcc/cp/cp-trait.def ../../src/gcc/cp/operators.def \
+ ../../src/gcc/gimple-expr.h ../../src/gcc/cgraph.h \
+ ../../src/gcc/ipa-ref.h ../../src/gcc/../include/plugin-api.h \
+ ../../src/gcc/ipa-param-manipulation.h ../../src/gcc/cif-code.def \
+ ../../src/gcc/stor-layout.h ../../src/gcc/print-tree.h \
+ ../../src/gcc/tree-iterator.h ../../src/gcc/tree-inline.h \
+ ../../src/gcc/debug.h ../../src/gcc/convert.h ../../src/gcc/gimplify.h \
+ ../../src/gcc/stringpool.h ../../src/gcc/attribs.h ../../src/gcc/flags.h \
+ ../../src/gcc/selftest.h gt-cp-tree.h
+config.h:
+auto-host.h:
+../../src/gcc/../include/ansidecl.h:
+../../src/gcc/system.h:
+../../src/gcc/../include/safe-ctype.h:
+../../src/gcc/../include/filenames.h:
+../../src/gcc/../include/hashtab.h:
+../../src/gcc/../include/ansidecl.h:
+../../src/gcc/../include/libiberty.h:
+../../src/gcc/hwint.h:
+../../src/gcc/coretypes.h:
+insn-modes.h:
+../../src/gcc/signop.h:
+../../src/gcc/wide-int.h:
+../../src/gcc/wide-int-print.h:
+../../src/gcc/poly-int.h:
+../../src/gcc/poly-int-types.h:
+insn-modes-inline.h:
+../../src/gcc/machmode.h:
+../../src/gcc/mode-classes.def:
+../../src/gcc/double-int.h:
+../../src/gcc/align.h:
+../../src/gcc/iterator-utils.h:
+../../src/gcc/real.h:
+../../src/gcc/fixed-value.h:
+../../src/gcc/hash-table.h:
+../../src/gcc/statistics.h:
+../../src/gcc/ggc.h:
+gtype-desc.h:
+../../src/gcc/vec.h:
+../../src/gcc/../include/hashtab.h:
+../../src/gcc/inchash.h:
+../../src/gcc/mem-stats-traits.h:
+../../src/gcc/hash-traits.h:
+../../src/gcc/hash-map-traits.h:
+../../src/gcc/mem-stats.h:
+../../src/gcc/hash-map.h:
+../../src/gcc/hash-set.h:
+../../src/gcc/input.h:
+../../src/gcc/../libcpp/include/line-map.h:
+../../src/gcc/is-a.h:
+../../src/gcc/memory-block.h:
+../../src/gcc/dumpfile.h:
+../../src/gcc/profile-count.h:
+../../src/gcc/tree.h:
+../../src/gcc/tree-core.h:
+../../src/gcc/../libcpp/include/symtab.h:
+../../src/gcc/../include/obstack.h:
+all-tree.def:
+../../src/gcc/tree.def:
+../../src/gcc/c-family/c-common.def:
+../../src/gcc/ada/gcc-interface/ada-tree.def:
+../../src/gcc/c/c-tree.def:
+../../src/gcc/cp/cp-tree.def:
+../../src/gcc/d/d-tree.def:
+../../src/gcc/m2/m2-tree.def:
+../../src/gcc/objc/objc-tree.def:
+../../src/gcc/builtins.def:
+../../src/gcc/sync-builtins.def:
+../../src/gcc/omp-builtins.def:
+../../src/gcc/gtm-builtins.def:
+../../src/gcc/sanitizer.def:
+../../src/gcc/coroutine-builtins.def:
+../../src/gcc/internal-fn.def:
+../../src/gcc/treestruct.def:
+options.h:
+../../src/gcc/flag-types.h:
+../../src/gcc/config/i386/i386-opts.h:
+../../src/gcc/config/i386/stringop.def:
+tree-check.h:
+../../src/gcc/cp/cp-tree.h:
+tm.h:
+options.h:
+insn-constants.h:
+../../src/gcc/config/vxworks-dummy.h:
+../../src/gcc/config/i386/biarch64.h:
+../../src/gcc/config/i386/i386.h:
+../../src/gcc/config/i386/x86-tune.def:
+../../src/gcc/wide-int-bitmask.h:
+../../src/gcc/config/i386/i386-isa.def:
+insn-attr-common.h:
+../../src/gcc/common/config/i386/i386-cpuinfo.h:
+../../src/gcc/config/i386/unix.h:
+../../src/gcc/config/i386/att.h:
+../../src/gcc/config/elfos.h:
+../../src/gcc/config/gnu-user.h:
+../../src/gcc/config/glibc-stdint.h:
+../../src/gcc/config/i386/x86-64.h:
+../../src/gcc/config/i386/gnu-user-common.h:
+../../src/gcc/config/i386/gnu-user64.h:
+../../src/gcc/config/linux.h:
+../../src/gcc/config/linux-android.h:
+../../src/gcc/config/i386/linux-common.h:
+../../src/gcc/config/i386/linux64.h:
+../../src/gcc/config/initfini-array.h:
+insn-flags.h:
+insn-modes.h:
+../../src/gcc/defaults.h:
+../../src/gcc/hard-reg-set.h:
+../../src/gcc/array-traits.h:
+../../src/gcc/function.h:
+../../src/gcc/tristate.h:
+../../src/gcc/cp/contracts.h:
+../../src/gcc/c-family/c-common.h:
+../../src/gcc/../include/splay-tree.h:
+../../src/gcc/../libcpp/include/cpplib.h:
+../../src/gcc/../libcpp/include/symtab.h:
+../../src/gcc/../libcpp/include/line-map.h:
+../../src/gcc/alias.h:
+../../src/gcc/fold-const.h:
+../../src/gcc/diagnostic-core.h:
+bversion.h:
+../../src/gcc/diagnostic.def:
+../../src/gcc/diagnostic.h:
+../../src/gcc/unique-argv.h:
+../../src/gcc/../libcpp/include/rich-location.h:
+../../src/gcc/../libcpp/include/label-text.h:
+../../src/gcc/pretty-print.h:
+../../src/gcc/diagnostic-url.h:
+../../src/gcc/diagnostic-core.h:
+../../src/gcc/cp/name-lookup.h:
+../../src/gcc/cp/cp-trait.def:
+../../src/gcc/cp/operators.def:
+../../src/gcc/gimple-expr.h:
+../../src/gcc/cgraph.h:
+../../src/gcc/ipa-ref.h:
+../../src/gcc/../include/plugin-api.h:
+../../src/gcc/ipa-param-manipulation.h:
+../../src/gcc/cif-code.def:
+../../src/gcc/stor-layout.h:
+../../src/gcc/print-tree.h:
+../../src/gcc/tree-iterator.h:
+../../src/gcc/tree-inline.h:
+../../src/gcc/debug.h:
+../../src/gcc/convert.h:
+../../src/gcc/gimplify.h:
+../../src/gcc/stringpool.h:
+../../src/gcc/attribs.h:
+../../src/gcc/flags.h:
+../../src/gcc/selftest.h:
+gt-cp-tree.h:

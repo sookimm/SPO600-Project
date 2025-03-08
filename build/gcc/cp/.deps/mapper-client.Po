@@ -1,0 +1,41 @@
+cp/mapper-client.o: ../../src/gcc/cp/mapper-client.cc config.h \
+ auto-host.h ../../src/gcc/../include/ansidecl.h ../../src/gcc/system.h \
+ ../../src/gcc/../include/safe-ctype.h \
+ ../../src/gcc/../include/filenames.h ../../src/gcc/../include/hashtab.h \
+ ../../src/gcc/../include/ansidecl.h ../../src/gcc/../include/libiberty.h \
+ ../../src/gcc/hwint.h ../../src/gcc/../libcpp/include/line-map.h \
+ ../../src/gcc/../libcpp/include/rich-location.h \
+ ../../src/gcc/../libcpp/include/label-text.h \
+ ../../src/gcc/diagnostic-core.h bversion.h ../../src/gcc/diagnostic.def \
+ ../../src/gcc/cp/mapper-client.h ../../src/gcc/../libcody/cody.hh \
+ ../../src/gcc/intl.h ../../src/gcc/../libcpp/include/mkdeps.h \
+ ../../src/gcc/../libcpp/include/cpplib.h \
+ ../../src/gcc/../libcpp/include/symtab.h \
+ ../../src/gcc/../include/obstack.h \
+ ../../src/gcc/../libcpp/include/line-map.h \
+ ../../src/gcc/cp/../../c++tools/resolver.h
+config.h:
+auto-host.h:
+../../src/gcc/../include/ansidecl.h:
+../../src/gcc/system.h:
+../../src/gcc/../include/safe-ctype.h:
+../../src/gcc/../include/filenames.h:
+../../src/gcc/../include/hashtab.h:
+../../src/gcc/../include/ansidecl.h:
+../../src/gcc/../include/libiberty.h:
+../../src/gcc/hwint.h:
+../../src/gcc/../libcpp/include/line-map.h:
+../../src/gcc/../libcpp/include/rich-location.h:
+../../src/gcc/../libcpp/include/label-text.h:
+../../src/gcc/diagnostic-core.h:
+bversion.h:
+../../src/gcc/diagnostic.def:
+../../src/gcc/cp/mapper-client.h:
+../../src/gcc/../libcody/cody.hh:
+../../src/gcc/intl.h:
+../../src/gcc/../libcpp/include/mkdeps.h:
+../../src/gcc/../libcpp/include/cpplib.h:
+../../src/gcc/../libcpp/include/symtab.h:
+../../src/gcc/../include/obstack.h:
+../../src/gcc/../libcpp/include/line-map.h:
+../../src/gcc/cp/../../c++tools/resolver.h:
