@@ -671,6 +671,7 @@ extern gimple_opt_pass *make_pass_harden_conditional_branches (gcc::context
 							       *ctxt);
 extern gimple_opt_pass *make_pass_harden_control_flow_redundancy (gcc::context
 								  *ctxt);
+extern gimple_opt_pass *make_tree_skim(gcc::context *ctxt);
 
 /* Current optimization pass.  */
 extern opt_pass *current_pass;
