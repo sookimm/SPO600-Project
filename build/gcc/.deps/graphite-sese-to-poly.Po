@@ -1,5 +1,0 @@
-graphite-sese-to-poly.o: ../../src/gcc/graphite-sese-to-poly.cc config.h \
- auto-host.h ../../src/gcc/../include/ansidecl.h
-config.h:
-auto-host.h:
-../../src/gcc/../include/ansidecl.h:

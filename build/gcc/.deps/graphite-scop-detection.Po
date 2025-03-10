@@ -1,5 +1,0 @@
-graphite-scop-detection.o: ../../src/gcc/graphite-scop-detection.cc \
- config.h auto-host.h ../../src/gcc/../include/ansidecl.h
-config.h:
-auto-host.h:
-../../src/gcc/../include/ansidecl.h:
