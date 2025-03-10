@@ -93,7 +93,7 @@ MAINTAINER_MODE_TRUE = #
 # -------------------------------------------------
 
 # The gcc driver likes to know the arguments it was configured with.
-TOPLEVEL_CONFIGURE_ARGUMENTS=../src/configure --prefix=/home/skim499/gcc-custom-pass/install --enable-languages=c,c++ --disable-multilib
+TOPLEVEL_CONFIGURE_ARGUMENTS=../src/configure --prefix=/home/skim499/gcc-custom-pass/install --disable-bootstrap --enable-languages=c,c++
 
 tooldir = ${exec_prefix}/x86_64-pc-linux-gnu
 build_tooldir = ${exec_prefix}/x86_64-pc-linux-gnu
@@ -114,7 +114,7 @@ host_shared = no
 BUILD_SUBDIR = build-x86_64-pc-linux-gnu
 # This is set by the configure script to the arguments to use when configuring
 # directories built for the build system.
-BUILD_CONFIGARGS =  --cache-file=./config.cache '--prefix=/home/skim499/gcc-custom-pass/install' '--disable-multilib' '--enable-languages=c,c++,lto' --program-transform-name='s,y,y,' --disable-option-checking --disable-year2038 --with-build-subdir="$(BUILD_SUBDIR)"
+BUILD_CONFIGARGS =  --cache-file=./config.cache '--prefix=/home/skim499/gcc-custom-pass/install' '--disable-bootstrap' '--enable-languages=c,c++,lto' --program-transform-name='s,y,y,' --disable-option-checking --disable-year2038 --with-build-subdir="$(BUILD_SUBDIR)"
 
 # Linker flags to use on the host, for stage1 or when not
 # bootstrapping.
@@ -184,7 +184,7 @@ SUBDIRS =  libiberty zlib libbacktrace libcpp libcody libdecnumber fixincludes g
 TARGET_CONFIGDIRS =  libgcc libgomp libatomic libitm libstdc++-v3 libsanitizer libvtv libssp libquadmath
 # This is set by the configure script to the arguments to use when configuring
 # directories built for the host system.
-HOST_CONFIGARGS =  --cache-file=./config.cache  '--prefix=/home/skim499/gcc-custom-pass/install' '--disable-multilib' '--enable-languages=c,c++,lto' --program-transform-name='s,y,y,' --disable-option-checking --disable-year2038
+HOST_CONFIGARGS =  --cache-file=./config.cache  '--prefix=/home/skim499/gcc-custom-pass/install' '--disable-bootstrap' '--enable-languages=c,c++,lto' --program-transform-name='s,y,y,' --disable-option-checking --disable-year2038
 # Host programs are put under this directory, which is . except if building
 # with srcdir=..
 HOST_SUBDIR = .
@@ -241,25 +241,11 @@ HOST_EXPORTS = \
 	ISLLIBS="$(HOST_ISLLIBS)"; export ISLLIBS; \
 	ISLINC="$(HOST_ISLINC)"; export ISLINC; \
 	XGCC_FLAGS_FOR_TARGET="$(XGCC_FLAGS_FOR_TARGET)"; export XGCC_FLAGS_FOR_TARGET; \
-	$(RPATH_ENVVAR)=`echo "$(TARGET_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
 	$(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR);
 
 POSTSTAGE1_CXX_EXPORT = \
 	CXX='$(CXX)'; export CXX; \
 	CXX_FOR_BUILD='$(CXX_FOR_BUILD)'; export CXX_FOR_BUILD;
-# Override the above if we're bootstrapping C++.
-POSTSTAGE1_CXX_EXPORT = \
-	CXX="$(STAGE_CC_WRAPPER) $$r/$(HOST_SUBDIR)/prev-gcc/xg++$(exeext) \
-	  -B$$r/$(HOST_SUBDIR)/prev-gcc/ -B$(build_tooldir)/bin/ -nostdinc++ \
-	  -B$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/src/.libs \
-	  -B$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/libsupc++/.libs \
-	  `if $(LEAN); then echo ' -isystem '; else echo ' -I'; fi`$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/include/$(TARGET_SUBDIR) \
-	  `if $(LEAN); then echo ' -isystem '; else echo ' -I'; fi`$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/include \
-	  `if $(LEAN); then echo ' -isystem '; else echo ' -I'; fi`$$s/libstdc++-v3/libsupc++ \
-	  -L$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/src/.libs \
-	  -L$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/libsupc++/.libs"; \
-	  export CXX; \
-	CXX_FOR_BUILD="$$CXX"; export CXX_FOR_BUILD;
 
 # Similar, for later GCC stages.
 POSTSTAGE1_HOST_EXPORTS = \
@@ -289,7 +275,7 @@ POSTSTAGE1_HOST_EXPORTS = \
 TARGET_SUBDIR = x86_64-pc-linux-gnu
 # This is set by the configure script to the arguments to use when configuring
 # directories built for the target.
-TARGET_CONFIGARGS = --cache-file=./config.cache   '--prefix=/home/skim499/gcc-custom-pass/install' '--disable-multilib' '--enable-languages=c,c++,lto' --program-transform-name='s,y,y,' --disable-option-checking --disable-year2038 --with-target-subdir="$(TARGET_SUBDIR)"
+TARGET_CONFIGARGS = --cache-file=./config.cache --enable-multilib   '--prefix=/home/skim499/gcc-custom-pass/install' '--disable-bootstrap' '--enable-languages=c,c++,lto' --program-transform-name='s,y,y,' --disable-option-checking --disable-year2038 --with-target-subdir="$(TARGET_SUBDIR)"
 # This is the list of variables to export in the environment when
 # configuring subdirectories for the target system.
 BASE_TARGET_EXPORTS = \
@@ -320,7 +306,6 @@ BASE_TARGET_EXPORTS = \
 	SYSROOT_CFLAGS_FOR_TARGET="$(SYSROOT_CFLAGS_FOR_TARGET)"; export SYSROOT_CFLAGS_FOR_TARGET; \
 	WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
 	WINDMC="$(WINDMC_FOR_TARGET)"; export WINDMC; \
-	$(RPATH_ENVVAR)=`echo "$(TARGET_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
 	$(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
 	TARGET_CONFIGDIRS="$(TARGET_CONFIGDIRS)"; export TARGET_CONFIGDIRS;
 
@@ -416,7 +401,7 @@ AS = as
 AR = ar --plugin /usr/libexec/gcc/x86_64-redhat-linux/14/liblto_plugin.so
 AR_FLAGS = rc
 CC = gcc
-CXX = g++ -std=c++14
+CXX = g++
 DLLTOOL = dlltool
 DSYMUTIL = dsymutil
 LD = ld
@@ -507,72 +492,54 @@ STAGE_CONFIGURE_FLAGS=--enable-werror-always
 # Defaults for stage 1; some are overridden below.
 STAGE1_CFLAGS = $(STAGE_CFLAGS)
 STAGE1_CXXFLAGS = $(CXXFLAGS)
-# Override the above if we're bootstrapping C++.
-STAGE1_CXXFLAGS = $(STAGE1_CFLAGS)
 STAGE1_TFLAGS = $(STAGE_TFLAGS)
 STAGE1_CONFIGURE_FLAGS = $(STAGE_CONFIGURE_FLAGS)
 
 # Defaults for stage 2; some are overridden below.
 STAGE2_CFLAGS = $(STAGE_CFLAGS)
 STAGE2_CXXFLAGS = $(CXXFLAGS)
-# Override the above if we're bootstrapping C++.
-STAGE2_CXXFLAGS = $(STAGE2_CFLAGS)
 STAGE2_TFLAGS = $(STAGE_TFLAGS)
 STAGE2_CONFIGURE_FLAGS = $(STAGE_CONFIGURE_FLAGS)
 
 # Defaults for stage 3; some are overridden below.
 STAGE3_CFLAGS = $(STAGE_CFLAGS)
 STAGE3_CXXFLAGS = $(CXXFLAGS)
-# Override the above if we're bootstrapping C++.
-STAGE3_CXXFLAGS = $(STAGE3_CFLAGS)
 STAGE3_TFLAGS = $(STAGE_TFLAGS)
 STAGE3_CONFIGURE_FLAGS = $(STAGE_CONFIGURE_FLAGS)
 
 # Defaults for stage 4; some are overridden below.
 STAGE4_CFLAGS = $(STAGE_CFLAGS)
 STAGE4_CXXFLAGS = $(CXXFLAGS)
-# Override the above if we're bootstrapping C++.
-STAGE4_CXXFLAGS = $(STAGE4_CFLAGS)
 STAGE4_TFLAGS = $(STAGE_TFLAGS)
 STAGE4_CONFIGURE_FLAGS = $(STAGE_CONFIGURE_FLAGS)
 
 # Defaults for stage profile; some are overridden below.
 STAGEprofile_CFLAGS = $(STAGE_CFLAGS)
 STAGEprofile_CXXFLAGS = $(CXXFLAGS)
-# Override the above if we're bootstrapping C++.
-STAGEprofile_CXXFLAGS = $(STAGEprofile_CFLAGS)
 STAGEprofile_TFLAGS = $(STAGE_TFLAGS)
 STAGEprofile_CONFIGURE_FLAGS = $(STAGE_CONFIGURE_FLAGS)
 
 # Defaults for stage train; some are overridden below.
 STAGEtrain_CFLAGS = $(STAGE_CFLAGS)
 STAGEtrain_CXXFLAGS = $(CXXFLAGS)
-# Override the above if we're bootstrapping C++.
-STAGEtrain_CXXFLAGS = $(STAGEtrain_CFLAGS)
 STAGEtrain_TFLAGS = $(STAGE_TFLAGS)
 STAGEtrain_CONFIGURE_FLAGS = $(STAGE_CONFIGURE_FLAGS)
 
 # Defaults for stage feedback; some are overridden below.
 STAGEfeedback_CFLAGS = $(STAGE_CFLAGS)
 STAGEfeedback_CXXFLAGS = $(CXXFLAGS)
-# Override the above if we're bootstrapping C++.
-STAGEfeedback_CXXFLAGS = $(STAGEfeedback_CFLAGS)
 STAGEfeedback_TFLAGS = $(STAGE_TFLAGS)
 STAGEfeedback_CONFIGURE_FLAGS = $(STAGE_CONFIGURE_FLAGS)
 
 # Defaults for stage autoprofile; some are overridden below.
 STAGEautoprofile_CFLAGS = $(STAGE_CFLAGS)
 STAGEautoprofile_CXXFLAGS = $(CXXFLAGS)
-# Override the above if we're bootstrapping C++.
-STAGEautoprofile_CXXFLAGS = $(STAGEautoprofile_CFLAGS)
 STAGEautoprofile_TFLAGS = $(STAGE_TFLAGS)
 STAGEautoprofile_CONFIGURE_FLAGS = $(STAGE_CONFIGURE_FLAGS)
 
 # Defaults for stage autofeedback; some are overridden below.
 STAGEautofeedback_CFLAGS = $(STAGE_CFLAGS)
 STAGEautofeedback_CXXFLAGS = $(CXXFLAGS)
-# Override the above if we're bootstrapping C++.
-STAGEautofeedback_CXXFLAGS = $(STAGEautofeedback_CFLAGS)
 STAGEautofeedback_TFLAGS = $(STAGE_TFLAGS)
 STAGEautofeedback_CONFIGURE_FLAGS = $(STAGE_CONFIGURE_FLAGS)
 
@@ -938,11 +905,6 @@ POSTSTAGE1_FLAGS_TO_PASS = \
 	$(LTO_FLAGS_TO_PASS) \
 	"`echo 'ADAFLAGS=$(BOOT_ADAFLAGS)' | sed -e s'/[^=][^=]*=$$/XFOO=/'`"
 
-EXTRA_HOST_EXPORTS = if [ $(current_stage) != stage1 ]; then \
-		       $(POSTSTAGE1_HOST_EXPORTS) \
-		     fi;
-
-EXTRA_BOOTSTRAP_FLAGS = CC="$$CC" CXX="$$CXX" LDFLAGS="$$LDFLAGS"
 
 # Flags to pass down to makes which are built with the target environment.
 # The double $ decreases the length of the command line; those variables
@@ -999,7 +961,7 @@ EXTRA_GCC_FLAGS = \
 
 GCC_FLAGS_TO_PASS = $(BASE_FLAGS_TO_PASS) $(EXTRA_HOST_FLAGS) $(EXTRA_GCC_FLAGS)
 
-BUILD_CONFIG = bootstrap-debug
+BUILD_CONFIG = 
 ifneq ($(BUILD_CONFIG),)
 include $(foreach CONFIG, $(BUILD_CONFIG), $(srcdir)/config/$(CONFIG).mk)
 endif
@@ -1096,21 +1058,11 @@ configure-target:  \
 # 3. Use "make clean" to remove the previous build.
 # 4. Rebuild with -fprofile-use.
 all:
-	[ -f stage_final ] || echo stage3 > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) `cat stage_final`-bubble
 	@: $(MAKE); $(unstage)
 	+@r=`${PWD_COMMAND}`; export r; \
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	if [ -f stage_last ]; then \
-	  TFLAGS="$(STAGE$(shell test ! -f stage_last || sed s,^stage,, stage_last)_TFLAGS)"; \
-	  $(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target; \
-	else \
 	  $(MAKE) $(RECURSE_FLAGS_TO_PASS) \
 		$(PGO_BUILD_GEN_FLAGS_TO_PASS) all-host all-target \
-	    ; \
-	fi \
 	&& :
 
 .PHONY: all-build
@@ -1132,16 +1084,23 @@ all-host: maybe-all-etc
 all-host: maybe-all-fastjar
 all-host: maybe-all-fixincludes
 all-host: maybe-all-flex
+all-host: maybe-all-gcc
 all-host: maybe-all-gprof
 all-host: maybe-all-gprofng
 all-host: maybe-all-tcl
 all-host: maybe-all-itcl
+all-host: maybe-all-libbacktrace
+all-host: maybe-all-libcpp
+all-host: maybe-all-libcody
+all-host: maybe-all-libdecnumber
 all-host: maybe-all-libgui
+all-host: maybe-all-libiberty
 all-host: maybe-all-m4
 all-host: maybe-all-readline
 all-host: maybe-all-sid
 all-host: maybe-all-sim
 all-host: maybe-all-texinfo
+all-host: maybe-all-zlib
 all-host: maybe-all-gnulib
 all-host: maybe-all-gdbsupport
 all-host: maybe-all-gdbserver
@@ -1153,15 +1112,18 @@ all-host: maybe-all-libtermcap
 all-host: maybe-all-utils
 all-host: maybe-all-c++tools
 all-host: maybe-all-gnattools
+all-host: maybe-all-lto-plugin
 all-host: maybe-all-libcc1
 all-host: maybe-all-gotools
 
 .PHONY: all-target
 
+all-target: maybe-all-target-libstdc++-v3
 all-target: maybe-all-target-libsanitizer
 all-target: maybe-all-target-libvtv
 all-target: maybe-all-target-libssp
 all-target: maybe-all-target-newlib
+all-target: maybe-all-target-libgcc
 all-target: maybe-all-target-libquadmath
 all-target: maybe-all-target-libgfortran
 all-target: maybe-all-target-libobjc
@@ -1173,6 +1135,7 @@ all-target: maybe-all-target-libffi
 all-target: maybe-all-target-rda
 all-target: maybe-all-target-libada
 all-target: maybe-all-target-libgm2
+all-target: maybe-all-target-libgomp
 all-target: maybe-all-target-libitm
 all-target: maybe-all-target-libatomic
 all-target: maybe-all-target-libgrust
@@ -2991,7 +2954,6 @@ TAGS: do-TAGS
 
 .PHONY: configure-build-libiberty maybe-configure-build-libiberty
 maybe-configure-build-libiberty:
-configure-build-libiberty: stage_current
 maybe-configure-build-libiberty: configure-build-libiberty
 configure-build-libiberty: 
 	@: $(MAKE); $(unstage)
@@ -3022,7 +2984,6 @@ configure-build-libiberty:
 
 .PHONY: all-build-libiberty maybe-all-build-libiberty
 maybe-all-build-libiberty:
-all-build-libiberty: stage_current
 TARGET-build-libiberty=all
 maybe-all-build-libiberty: all-build-libiberty
 all-build-libiberty: configure-build-libiberty
@@ -3040,7 +3001,6 @@ all-build-libiberty: configure-build-libiberty
 
 .PHONY: configure-build-bison maybe-configure-build-bison
 maybe-configure-build-bison:
-configure-build-bison: stage_current
 
 
 
@@ -3048,7 +3008,6 @@ configure-build-bison: stage_current
 
 .PHONY: all-build-bison maybe-all-build-bison
 maybe-all-build-bison:
-all-build-bison: stage_current
 
 
 
@@ -3056,7 +3015,6 @@ all-build-bison: stage_current
 
 .PHONY: configure-build-flex maybe-configure-build-flex
 maybe-configure-build-flex:
-configure-build-flex: stage_current
 
 
 
@@ -3064,7 +3022,6 @@ configure-build-flex: stage_current
 
 .PHONY: all-build-flex maybe-all-build-flex
 maybe-all-build-flex:
-all-build-flex: stage_current
 
 
 
@@ -3072,7 +3029,6 @@ all-build-flex: stage_current
 
 .PHONY: configure-build-m4 maybe-configure-build-m4
 maybe-configure-build-m4:
-configure-build-m4: stage_current
 
 
 
@@ -3080,7 +3036,6 @@ configure-build-m4: stage_current
 
 .PHONY: all-build-m4 maybe-all-build-m4
 maybe-all-build-m4:
-all-build-m4: stage_current
 
 
 
@@ -3088,7 +3043,6 @@ all-build-m4: stage_current
 
 .PHONY: configure-build-texinfo maybe-configure-build-texinfo
 maybe-configure-build-texinfo:
-configure-build-texinfo: stage_current
 
 
 
@@ -3096,7 +3050,6 @@ configure-build-texinfo: stage_current
 
 .PHONY: all-build-texinfo maybe-all-build-texinfo
 maybe-all-build-texinfo:
-all-build-texinfo: stage_current
 
 
 
@@ -3104,7 +3057,6 @@ all-build-texinfo: stage_current
 
 .PHONY: configure-build-fixincludes maybe-configure-build-fixincludes
 maybe-configure-build-fixincludes:
-configure-build-fixincludes: stage_current
 maybe-configure-build-fixincludes: configure-build-fixincludes
 configure-build-fixincludes: 
 	@: $(MAKE); $(unstage)
@@ -3135,7 +3087,6 @@ configure-build-fixincludes:
 
 .PHONY: all-build-fixincludes maybe-all-build-fixincludes
 maybe-all-build-fixincludes:
-all-build-fixincludes: stage_current
 TARGET-build-fixincludes=all
 maybe-all-build-fixincludes: all-build-fixincludes
 all-build-fixincludes: configure-build-fixincludes
@@ -3153,7 +3104,6 @@ all-build-fixincludes: configure-build-fixincludes
 
 .PHONY: configure-build-libcpp maybe-configure-build-libcpp
 maybe-configure-build-libcpp:
-configure-build-libcpp: stage_current
 maybe-configure-build-libcpp: configure-build-libcpp
 configure-build-libcpp: 
 	@: $(MAKE); $(unstage)
@@ -3184,7 +3134,6 @@ configure-build-libcpp:
 
 .PHONY: all-build-libcpp maybe-all-build-libcpp
 maybe-all-build-libcpp:
-all-build-libcpp: stage_current
 TARGET-build-libcpp=all
 maybe-all-build-libcpp: all-build-libcpp
 all-build-libcpp: configure-build-libcpp
@@ -3207,7 +3156,6 @@ all-build-libcpp: configure-build-libcpp
 
 .PHONY: configure-bfd maybe-configure-bfd
 maybe-configure-bfd:
-configure-bfd: stage_current
 
 
 
@@ -3244,7 +3192,6 @@ maybe-configure-stageautofeedback-bfd:
 
 .PHONY: all-bfd maybe-all-bfd
 maybe-all-bfd:
-all-bfd: stage_current
 
 
 
@@ -3362,7 +3309,6 @@ maybe-maintainer-clean-bfd:
 
 .PHONY: configure-opcodes maybe-configure-opcodes
 maybe-configure-opcodes:
-configure-opcodes: stage_current
 
 
 
@@ -3399,7 +3345,6 @@ maybe-configure-stageautofeedback-opcodes:
 
 .PHONY: all-opcodes maybe-all-opcodes
 maybe-all-opcodes:
-all-opcodes: stage_current
 
 
 
@@ -3517,7 +3462,6 @@ maybe-maintainer-clean-opcodes:
 
 .PHONY: configure-binutils maybe-configure-binutils
 maybe-configure-binutils:
-configure-binutils: stage_current
 
 
 
@@ -3554,7 +3498,6 @@ maybe-configure-stageautofeedback-binutils:
 
 .PHONY: all-binutils maybe-all-binutils
 maybe-all-binutils:
-all-binutils: stage_current
 
 
 
@@ -3672,7 +3615,6 @@ maybe-maintainer-clean-binutils:
 
 .PHONY: configure-bison maybe-configure-bison
 maybe-configure-bison:
-configure-bison: stage_current
 
 
 
@@ -3680,7 +3622,6 @@ configure-bison: stage_current
 
 .PHONY: all-bison maybe-all-bison
 maybe-all-bison:
-all-bison: stage_current
 
 
 
@@ -3742,7 +3683,6 @@ maybe-maintainer-clean-bison:
 
 .PHONY: configure-cgen maybe-configure-cgen
 maybe-configure-cgen:
-configure-cgen: stage_current
 
 
 
@@ -3750,7 +3690,6 @@ configure-cgen: stage_current
 
 .PHONY: all-cgen maybe-all-cgen
 maybe-all-cgen:
-all-cgen: stage_current
 
 
 
@@ -3812,7 +3751,6 @@ maybe-maintainer-clean-cgen:
 
 .PHONY: configure-dejagnu maybe-configure-dejagnu
 maybe-configure-dejagnu:
-configure-dejagnu: stage_current
 
 
 
@@ -3820,7 +3758,6 @@ configure-dejagnu: stage_current
 
 .PHONY: all-dejagnu maybe-all-dejagnu
 maybe-all-dejagnu:
-all-dejagnu: stage_current
 
 
 
@@ -3882,7 +3819,6 @@ maybe-maintainer-clean-dejagnu:
 
 .PHONY: configure-etc maybe-configure-etc
 maybe-configure-etc:
-configure-etc: stage_current
 
 
 
@@ -3890,7 +3826,6 @@ configure-etc: stage_current
 
 .PHONY: all-etc maybe-all-etc
 maybe-all-etc:
-all-etc: stage_current
 
 
 
@@ -3952,7 +3887,6 @@ maybe-maintainer-clean-etc:
 
 .PHONY: configure-fastjar maybe-configure-fastjar
 maybe-configure-fastjar:
-configure-fastjar: stage_current
 
 
 
@@ -3960,7 +3894,6 @@ configure-fastjar: stage_current
 
 .PHONY: all-fastjar maybe-all-fastjar
 maybe-all-fastjar:
-all-fastjar: stage_current
 
 
 
@@ -4022,7 +3955,6 @@ maybe-maintainer-clean-fastjar:
 
 .PHONY: configure-fixincludes maybe-configure-fixincludes
 maybe-configure-fixincludes:
-configure-fixincludes: stage_current
 maybe-configure-fixincludes: configure-fixincludes
 configure-fixincludes: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -4080,7 +4012,6 @@ maybe-configure-stageautofeedback-fixincludes:
 
 .PHONY: all-fixincludes maybe-all-fixincludes
 maybe-all-fixincludes:
-all-fixincludes: stage_current
 TARGET-fixincludes=all
 maybe-all-fixincludes: all-fixincludes
 all-fixincludes: configure-fixincludes
@@ -4486,7 +4417,6 @@ maintainer-clean-fixincludes:
 
 .PHONY: configure-flex maybe-configure-flex
 maybe-configure-flex:
-configure-flex: stage_current
 
 
 
@@ -4494,7 +4424,6 @@ configure-flex: stage_current
 
 .PHONY: all-flex maybe-all-flex
 maybe-all-flex:
-all-flex: stage_current
 
 
 
@@ -4556,7 +4485,6 @@ maybe-maintainer-clean-flex:
 
 .PHONY: configure-gas maybe-configure-gas
 maybe-configure-gas:
-configure-gas: stage_current
 
 
 
@@ -4593,7 +4521,6 @@ maybe-configure-stageautofeedback-gas:
 
 .PHONY: all-gas maybe-all-gas
 maybe-all-gas:
-all-gas: stage_current
 
 
 
@@ -4711,7 +4638,6 @@ maybe-maintainer-clean-gas:
 
 .PHONY: configure-gcc maybe-configure-gcc
 maybe-configure-gcc:
-configure-gcc: stage_current
 maybe-configure-gcc: configure-gcc
 configure-gcc: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -4738,290 +4664,30 @@ configure-gcc:
 
 .PHONY: configure-stage1-gcc maybe-configure-stage1-gcc
 maybe-configure-stage1-gcc:
-maybe-configure-stage1-gcc: configure-stage1-gcc
-configure-stage1-gcc:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/gcc/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	CFLAGS="$(STAGE1_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE1_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(HOST_SUBDIR)/gcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc; \
-	cd $(HOST_SUBDIR)/gcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/gcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=gcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS) \
-	  
 
 .PHONY: configure-stage2-gcc maybe-configure-stage2-gcc
 maybe-configure-stage2-gcc:
-maybe-configure-stage2-gcc: configure-stage2-gcc
-configure-stage2-gcc:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/gcc/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE2_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE2_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE2_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(HOST_SUBDIR)/gcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc; \
-	cd $(HOST_SUBDIR)/gcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/gcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=gcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS) \
-	  
 
 .PHONY: configure-stage3-gcc maybe-configure-stage3-gcc
 maybe-configure-stage3-gcc:
-maybe-configure-stage3-gcc: configure-stage3-gcc
-configure-stage3-gcc:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/gcc/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE3_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE3_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE3_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(HOST_SUBDIR)/gcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc; \
-	cd $(HOST_SUBDIR)/gcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/gcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=gcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS) \
-	  
 
 .PHONY: configure-stage4-gcc maybe-configure-stage4-gcc
 maybe-configure-stage4-gcc:
-maybe-configure-stage4-gcc: configure-stage4-gcc
-configure-stage4-gcc:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/gcc/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE4_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE4_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE4_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(HOST_SUBDIR)/gcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc; \
-	cd $(HOST_SUBDIR)/gcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/gcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=gcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS) \
-	  
 
 .PHONY: configure-stageprofile-gcc maybe-configure-stageprofile-gcc
 maybe-configure-stageprofile-gcc:
-maybe-configure-stageprofile-gcc: configure-stageprofile-gcc
-configure-stageprofile-gcc:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/gcc/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(HOST_SUBDIR)/gcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc; \
-	cd $(HOST_SUBDIR)/gcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/gcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=gcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS) \
-	  
 
 .PHONY: configure-stagetrain-gcc maybe-configure-stagetrain-gcc
 maybe-configure-stagetrain-gcc:
-maybe-configure-stagetrain-gcc: configure-stagetrain-gcc
-configure-stagetrain-gcc:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/gcc/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEtrain_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEtrain_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEtrain_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(HOST_SUBDIR)/gcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc; \
-	cd $(HOST_SUBDIR)/gcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/gcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=gcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS) \
-	  
 
 .PHONY: configure-stagefeedback-gcc maybe-configure-stagefeedback-gcc
 maybe-configure-stagefeedback-gcc:
-maybe-configure-stagefeedback-gcc: configure-stagefeedback-gcc
-configure-stagefeedback-gcc:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/gcc/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEfeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEfeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEfeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(HOST_SUBDIR)/gcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc; \
-	cd $(HOST_SUBDIR)/gcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/gcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=gcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS) \
-	  
 
 .PHONY: configure-stageautoprofile-gcc maybe-configure-stageautoprofile-gcc
 maybe-configure-stageautoprofile-gcc:
-maybe-configure-stageautoprofile-gcc: configure-stageautoprofile-gcc
-configure-stageautoprofile-gcc:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/gcc/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautoprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautoprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(HOST_SUBDIR)/gcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc; \
-	cd $(HOST_SUBDIR)/gcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/gcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=gcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS) \
-	  
 
 .PHONY: configure-stageautofeedback-gcc maybe-configure-stageautofeedback-gcc
 maybe-configure-stageautofeedback-gcc:
-maybe-configure-stageautofeedback-gcc: configure-stageautofeedback-gcc
-configure-stageautofeedback-gcc:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/gcc/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautofeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautofeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(HOST_SUBDIR)/gcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/gcc; \
-	cd $(HOST_SUBDIR)/gcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/gcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=gcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS) \
-	  
 
 
 
@@ -5029,7 +4695,6 @@ configure-stageautofeedback-gcc:
 
 .PHONY: all-gcc maybe-all-gcc
 maybe-all-gcc:
-all-gcc: stage_current
 TARGET-gcc=all
 maybe-all-gcc: all-gcc
 all-gcc: configure-gcc
@@ -5046,370 +4711,54 @@ all-gcc: configure-gcc
 .PHONY: clean-stage1-gcc maybe-clean-stage1-gcc
 maybe-all-stage1-gcc:
 maybe-clean-stage1-gcc:
-maybe-all-stage1-gcc: all-stage1-gcc
-all-stage1: all-stage1-gcc
-TARGET-stage1-gcc = $(TARGET-gcc)
-all-stage1-gcc: configure-stage1-gcc
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/gcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE1_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE1_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE1_CXXFLAGS)" \
-		LIBCFLAGS="$(LIBCFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS)  \
-		$(STAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-gcc)
-
-maybe-clean-stage1-gcc: clean-stage1-gcc
-clean-stage1: clean-stage1-gcc
-clean-stage1-gcc:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(HOST_SUBDIR)/gcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage1-gcc/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/gcc && \
-	$(MAKE) $(EXTRA_HOST_FLAGS)  \
-	$(STAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) clean
 
 
 .PHONY: all-stage2-gcc maybe-all-stage2-gcc
 .PHONY: clean-stage2-gcc maybe-clean-stage2-gcc
 maybe-all-stage2-gcc:
 maybe-clean-stage2-gcc:
-maybe-all-stage2-gcc: all-stage2-gcc
-all-stage2: all-stage2-gcc
-TARGET-stage2-gcc = $(TARGET-gcc)
-all-stage2-gcc: configure-stage2-gcc
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/gcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE2_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE2_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE2_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE2_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-gcc)
-
-maybe-clean-stage2-gcc: clean-stage2-gcc
-clean-stage2: clean-stage2-gcc
-clean-stage2-gcc:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(HOST_SUBDIR)/gcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage2-gcc/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/gcc && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) clean
 
 
 .PHONY: all-stage3-gcc maybe-all-stage3-gcc
 .PHONY: clean-stage3-gcc maybe-clean-stage3-gcc
 maybe-all-stage3-gcc:
 maybe-clean-stage3-gcc:
-maybe-all-stage3-gcc: all-stage3-gcc
-all-stage3: all-stage3-gcc
-TARGET-stage3-gcc = $(TARGET-gcc)
-all-stage3-gcc: configure-stage3-gcc
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/gcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE3_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE3_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE3_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE3_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-gcc)
-
-maybe-clean-stage3-gcc: clean-stage3-gcc
-clean-stage3: clean-stage3-gcc
-clean-stage3-gcc:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(HOST_SUBDIR)/gcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage3-gcc/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/gcc && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) clean
 
 
 .PHONY: all-stage4-gcc maybe-all-stage4-gcc
 .PHONY: clean-stage4-gcc maybe-clean-stage4-gcc
 maybe-all-stage4-gcc:
 maybe-clean-stage4-gcc:
-maybe-all-stage4-gcc: all-stage4-gcc
-all-stage4: all-stage4-gcc
-TARGET-stage4-gcc = $(TARGET-gcc)
-all-stage4-gcc: configure-stage4-gcc
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/gcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE4_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE4_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE4_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE4_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-gcc)
-
-maybe-clean-stage4-gcc: clean-stage4-gcc
-clean-stage4: clean-stage4-gcc
-clean-stage4-gcc:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(HOST_SUBDIR)/gcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage4-gcc/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/gcc && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) clean
 
 
 .PHONY: all-stageprofile-gcc maybe-all-stageprofile-gcc
 .PHONY: clean-stageprofile-gcc maybe-clean-stageprofile-gcc
 maybe-all-stageprofile-gcc:
 maybe-clean-stageprofile-gcc:
-maybe-all-stageprofile-gcc: all-stageprofile-gcc
-all-stageprofile: all-stageprofile-gcc
-TARGET-stageprofile-gcc = $(TARGET-gcc)
-all-stageprofile-gcc: configure-stageprofile-gcc
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/gcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-gcc)
-
-maybe-clean-stageprofile-gcc: clean-stageprofile-gcc
-clean-stageprofile: clean-stageprofile-gcc
-clean-stageprofile-gcc:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/gcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageprofile-gcc/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/gcc && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) clean
 
 
 .PHONY: all-stagetrain-gcc maybe-all-stagetrain-gcc
 .PHONY: clean-stagetrain-gcc maybe-clean-stagetrain-gcc
 maybe-all-stagetrain-gcc:
 maybe-clean-stagetrain-gcc:
-maybe-all-stagetrain-gcc: all-stagetrain-gcc
-all-stagetrain: all-stagetrain-gcc
-TARGET-stagetrain-gcc = $(TARGET-gcc)
-all-stagetrain-gcc: configure-stagetrain-gcc
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/gcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEtrain_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEtrain_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEtrain_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEtrain_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-gcc)
-
-maybe-clean-stagetrain-gcc: clean-stagetrain-gcc
-clean-stagetrain: clean-stagetrain-gcc
-clean-stagetrain-gcc:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(HOST_SUBDIR)/gcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagetrain-gcc/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/gcc && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) clean
 
 
 .PHONY: all-stagefeedback-gcc maybe-all-stagefeedback-gcc
 .PHONY: clean-stagefeedback-gcc maybe-clean-stagefeedback-gcc
 maybe-all-stagefeedback-gcc:
 maybe-clean-stagefeedback-gcc:
-maybe-all-stagefeedback-gcc: all-stagefeedback-gcc
-all-stagefeedback: all-stagefeedback-gcc
-TARGET-stagefeedback-gcc = $(TARGET-gcc)
-all-stagefeedback-gcc: configure-stagefeedback-gcc
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/gcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEfeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEfeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEfeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEfeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-gcc)
-
-maybe-clean-stagefeedback-gcc: clean-stagefeedback-gcc
-clean-stagefeedback: clean-stagefeedback-gcc
-clean-stagefeedback-gcc:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/gcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagefeedback-gcc/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/gcc && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) clean
 
 
 .PHONY: all-stageautoprofile-gcc maybe-all-stageautoprofile-gcc
 .PHONY: clean-stageautoprofile-gcc maybe-clean-stageautoprofile-gcc
 maybe-all-stageautoprofile-gcc:
 maybe-clean-stageautoprofile-gcc:
-maybe-all-stageautoprofile-gcc: all-stageautoprofile-gcc
-all-stageautoprofile: all-stageautoprofile-gcc
-TARGET-stageautoprofile-gcc = $(TARGET-gcc)
-all-stageautoprofile-gcc: configure-stageautoprofile-gcc
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/gcc && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautoprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-gcc)
-
-maybe-clean-stageautoprofile-gcc: clean-stageautoprofile-gcc
-clean-stageautoprofile: clean-stageautoprofile-gcc
-clean-stageautoprofile-gcc:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/gcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautoprofile-gcc/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/gcc && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) clean
 
 
 .PHONY: all-stageautofeedback-gcc maybe-all-stageautofeedback-gcc
 .PHONY: clean-stageautofeedback-gcc maybe-clean-stageautofeedback-gcc
 maybe-all-stageautofeedback-gcc:
 maybe-clean-stageautofeedback-gcc:
-maybe-all-stageautofeedback-gcc: all-stageautofeedback-gcc
-all-stageautofeedback: all-stageautofeedback-gcc
-TARGET-stageautofeedback-gcc = $(TARGET-gcc)
-all-stageautofeedback-gcc: configure-stageautofeedback-gcc
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/gcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautofeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-gcc)
-
-maybe-clean-stageautofeedback-gcc: clean-stageautofeedback-gcc
-clean-stageautofeedback: clean-stageautofeedback-gcc
-clean-stageautofeedback-gcc:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/gcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautofeedback-gcc/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/gcc && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) clean
 
 
 
@@ -5782,7 +5131,6 @@ maintainer-clean-gcc:
 
 .PHONY: configure-gmp maybe-configure-gmp
 maybe-configure-gmp:
-configure-gmp: stage_current
 
 
 
@@ -5819,7 +5167,6 @@ maybe-configure-stageautofeedback-gmp:
 
 .PHONY: all-gmp maybe-all-gmp
 maybe-all-gmp:
-all-gmp: stage_current
 
 
 
@@ -5937,7 +5284,6 @@ maybe-maintainer-clean-gmp:
 
 .PHONY: configure-mpfr maybe-configure-mpfr
 maybe-configure-mpfr:
-configure-mpfr: stage_current
 
 
 
@@ -5974,7 +5320,6 @@ maybe-configure-stageautofeedback-mpfr:
 
 .PHONY: all-mpfr maybe-all-mpfr
 maybe-all-mpfr:
-all-mpfr: stage_current
 
 
 
@@ -6092,7 +5437,6 @@ maybe-maintainer-clean-mpfr:
 
 .PHONY: configure-mpc maybe-configure-mpc
 maybe-configure-mpc:
-configure-mpc: stage_current
 
 
 
@@ -6129,7 +5473,6 @@ maybe-configure-stageautofeedback-mpc:
 
 .PHONY: all-mpc maybe-all-mpc
 maybe-all-mpc:
-all-mpc: stage_current
 
 
 
@@ -6247,7 +5590,6 @@ maybe-maintainer-clean-mpc:
 
 .PHONY: configure-isl maybe-configure-isl
 maybe-configure-isl:
-configure-isl: stage_current
 
 
 
@@ -6284,7 +5626,6 @@ maybe-configure-stageautofeedback-isl:
 
 .PHONY: all-isl maybe-all-isl
 maybe-all-isl:
-all-isl: stage_current
 
 
 
@@ -6402,7 +5743,6 @@ maybe-maintainer-clean-isl:
 
 .PHONY: configure-gold maybe-configure-gold
 maybe-configure-gold:
-configure-gold: stage_current
 
 
 
@@ -6439,7 +5779,6 @@ maybe-configure-stageautofeedback-gold:
 
 .PHONY: all-gold maybe-all-gold
 maybe-all-gold:
-all-gold: stage_current
 
 
 
@@ -6557,7 +5896,6 @@ maybe-maintainer-clean-gold:
 
 .PHONY: configure-gprof maybe-configure-gprof
 maybe-configure-gprof:
-configure-gprof: stage_current
 
 
 
@@ -6565,7 +5903,6 @@ configure-gprof: stage_current
 
 .PHONY: all-gprof maybe-all-gprof
 maybe-all-gprof:
-all-gprof: stage_current
 
 
 
@@ -6627,7 +5964,6 @@ maybe-maintainer-clean-gprof:
 
 .PHONY: configure-gprofng maybe-configure-gprofng
 maybe-configure-gprofng:
-configure-gprofng: stage_current
 
 
 
@@ -6635,7 +5971,6 @@ configure-gprofng: stage_current
 
 .PHONY: all-gprofng maybe-all-gprofng
 maybe-all-gprofng:
-all-gprofng: stage_current
 
 
 
@@ -6697,7 +6032,6 @@ maybe-maintainer-clean-gprofng:
 
 .PHONY: configure-gettext maybe-configure-gettext
 maybe-configure-gettext:
-configure-gettext: stage_current
 
 
 
@@ -6734,7 +6068,6 @@ maybe-configure-stageautofeedback-gettext:
 
 .PHONY: all-gettext maybe-all-gettext
 maybe-all-gettext:
-all-gettext: stage_current
 
 
 
@@ -6852,7 +6185,6 @@ maybe-maintainer-clean-gettext:
 
 .PHONY: configure-tcl maybe-configure-tcl
 maybe-configure-tcl:
-configure-tcl: stage_current
 
 
 
@@ -6860,7 +6192,6 @@ configure-tcl: stage_current
 
 .PHONY: all-tcl maybe-all-tcl
 maybe-all-tcl:
-all-tcl: stage_current
 
 
 
@@ -6922,7 +6253,6 @@ maybe-maintainer-clean-tcl:
 
 .PHONY: configure-itcl maybe-configure-itcl
 maybe-configure-itcl:
-configure-itcl: stage_current
 
 
 
@@ -6930,7 +6260,6 @@ configure-itcl: stage_current
 
 .PHONY: all-itcl maybe-all-itcl
 maybe-all-itcl:
-all-itcl: stage_current
 
 
 
@@ -6992,7 +6321,6 @@ maybe-maintainer-clean-itcl:
 
 .PHONY: configure-ld maybe-configure-ld
 maybe-configure-ld:
-configure-ld: stage_current
 
 
 
@@ -7029,7 +6357,6 @@ maybe-configure-stageautofeedback-ld:
 
 .PHONY: all-ld maybe-all-ld
 maybe-all-ld:
-all-ld: stage_current
 
 
 
@@ -7147,7 +6474,6 @@ maybe-maintainer-clean-ld:
 
 .PHONY: configure-libbacktrace maybe-configure-libbacktrace
 maybe-configure-libbacktrace:
-configure-libbacktrace: stage_current
 maybe-configure-libbacktrace: configure-libbacktrace
 configure-libbacktrace: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -7174,281 +6500,30 @@ configure-libbacktrace:
 
 .PHONY: configure-stage1-libbacktrace maybe-configure-stage1-libbacktrace
 maybe-configure-stage1-libbacktrace:
-maybe-configure-stage1-libbacktrace: configure-stage1-libbacktrace
-configure-stage1-libbacktrace:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libbacktrace/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	CFLAGS="$(STAGE1_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE1_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(HOST_SUBDIR)/libbacktrace; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace; \
-	cd $(HOST_SUBDIR)/libbacktrace || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libbacktrace/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libbacktrace; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage2-libbacktrace maybe-configure-stage2-libbacktrace
 maybe-configure-stage2-libbacktrace:
-maybe-configure-stage2-libbacktrace: configure-stage2-libbacktrace
-configure-stage2-libbacktrace:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libbacktrace/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE2_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE2_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE2_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(HOST_SUBDIR)/libbacktrace; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace; \
-	cd $(HOST_SUBDIR)/libbacktrace || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libbacktrace/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libbacktrace; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage3-libbacktrace maybe-configure-stage3-libbacktrace
 maybe-configure-stage3-libbacktrace:
-maybe-configure-stage3-libbacktrace: configure-stage3-libbacktrace
-configure-stage3-libbacktrace:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libbacktrace/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE3_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE3_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE3_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(HOST_SUBDIR)/libbacktrace; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace; \
-	cd $(HOST_SUBDIR)/libbacktrace || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libbacktrace/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libbacktrace; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage4-libbacktrace maybe-configure-stage4-libbacktrace
 maybe-configure-stage4-libbacktrace:
-maybe-configure-stage4-libbacktrace: configure-stage4-libbacktrace
-configure-stage4-libbacktrace:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libbacktrace/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE4_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE4_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE4_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(HOST_SUBDIR)/libbacktrace; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace; \
-	cd $(HOST_SUBDIR)/libbacktrace || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libbacktrace/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libbacktrace; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageprofile-libbacktrace maybe-configure-stageprofile-libbacktrace
 maybe-configure-stageprofile-libbacktrace:
-maybe-configure-stageprofile-libbacktrace: configure-stageprofile-libbacktrace
-configure-stageprofile-libbacktrace:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libbacktrace/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(HOST_SUBDIR)/libbacktrace; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace; \
-	cd $(HOST_SUBDIR)/libbacktrace || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libbacktrace/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libbacktrace; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagetrain-libbacktrace maybe-configure-stagetrain-libbacktrace
 maybe-configure-stagetrain-libbacktrace:
-maybe-configure-stagetrain-libbacktrace: configure-stagetrain-libbacktrace
-configure-stagetrain-libbacktrace:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libbacktrace/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEtrain_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEtrain_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEtrain_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(HOST_SUBDIR)/libbacktrace; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace; \
-	cd $(HOST_SUBDIR)/libbacktrace || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libbacktrace/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libbacktrace; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagefeedback-libbacktrace maybe-configure-stagefeedback-libbacktrace
 maybe-configure-stagefeedback-libbacktrace:
-maybe-configure-stagefeedback-libbacktrace: configure-stagefeedback-libbacktrace
-configure-stagefeedback-libbacktrace:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libbacktrace/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEfeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEfeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEfeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(HOST_SUBDIR)/libbacktrace; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace; \
-	cd $(HOST_SUBDIR)/libbacktrace || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libbacktrace/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libbacktrace; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautoprofile-libbacktrace maybe-configure-stageautoprofile-libbacktrace
 maybe-configure-stageautoprofile-libbacktrace:
-maybe-configure-stageautoprofile-libbacktrace: configure-stageautoprofile-libbacktrace
-configure-stageautoprofile-libbacktrace:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libbacktrace/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautoprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautoprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(HOST_SUBDIR)/libbacktrace; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace; \
-	cd $(HOST_SUBDIR)/libbacktrace || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libbacktrace/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libbacktrace; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautofeedback-libbacktrace maybe-configure-stageautofeedback-libbacktrace
 maybe-configure-stageautofeedback-libbacktrace:
-maybe-configure-stageautofeedback-libbacktrace: configure-stageautofeedback-libbacktrace
-configure-stageautofeedback-libbacktrace:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libbacktrace/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautofeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautofeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(HOST_SUBDIR)/libbacktrace; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libbacktrace; \
-	cd $(HOST_SUBDIR)/libbacktrace || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libbacktrace/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libbacktrace; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS)
 
 
 
@@ -7456,7 +6531,6 @@ configure-stageautofeedback-libbacktrace:
 
 .PHONY: all-libbacktrace maybe-all-libbacktrace
 maybe-all-libbacktrace:
-all-libbacktrace: stage_current
 TARGET-libbacktrace=all
 maybe-all-libbacktrace: all-libbacktrace
 all-libbacktrace: configure-libbacktrace
@@ -7473,370 +6547,54 @@ all-libbacktrace: configure-libbacktrace
 .PHONY: clean-stage1-libbacktrace maybe-clean-stage1-libbacktrace
 maybe-all-stage1-libbacktrace:
 maybe-clean-stage1-libbacktrace:
-maybe-all-stage1-libbacktrace: all-stage1-libbacktrace
-all-stage1: all-stage1-libbacktrace
-TARGET-stage1-libbacktrace = $(TARGET-libbacktrace)
-all-stage1-libbacktrace: configure-stage1-libbacktrace
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE1_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE1_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE1_CXXFLAGS)" \
-		LIBCFLAGS="$(LIBCFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS)  \
-		$(STAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-libbacktrace)
-
-maybe-clean-stage1-libbacktrace: clean-stage1-libbacktrace
-clean-stage1: clean-stage1-libbacktrace
-clean-stage1-libbacktrace:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(HOST_SUBDIR)/libbacktrace/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage1-libbacktrace/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	$(MAKE) $(EXTRA_HOST_FLAGS)  \
-	$(STAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage2-libbacktrace maybe-all-stage2-libbacktrace
 .PHONY: clean-stage2-libbacktrace maybe-clean-stage2-libbacktrace
 maybe-all-stage2-libbacktrace:
 maybe-clean-stage2-libbacktrace:
-maybe-all-stage2-libbacktrace: all-stage2-libbacktrace
-all-stage2: all-stage2-libbacktrace
-TARGET-stage2-libbacktrace = $(TARGET-libbacktrace)
-all-stage2-libbacktrace: configure-stage2-libbacktrace
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE2_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE2_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE2_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE2_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-libbacktrace)
-
-maybe-clean-stage2-libbacktrace: clean-stage2-libbacktrace
-clean-stage2: clean-stage2-libbacktrace
-clean-stage2-libbacktrace:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(HOST_SUBDIR)/libbacktrace/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage2-libbacktrace/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage3-libbacktrace maybe-all-stage3-libbacktrace
 .PHONY: clean-stage3-libbacktrace maybe-clean-stage3-libbacktrace
 maybe-all-stage3-libbacktrace:
 maybe-clean-stage3-libbacktrace:
-maybe-all-stage3-libbacktrace: all-stage3-libbacktrace
-all-stage3: all-stage3-libbacktrace
-TARGET-stage3-libbacktrace = $(TARGET-libbacktrace)
-all-stage3-libbacktrace: configure-stage3-libbacktrace
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE3_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE3_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE3_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE3_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-libbacktrace)
-
-maybe-clean-stage3-libbacktrace: clean-stage3-libbacktrace
-clean-stage3: clean-stage3-libbacktrace
-clean-stage3-libbacktrace:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(HOST_SUBDIR)/libbacktrace/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage3-libbacktrace/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage4-libbacktrace maybe-all-stage4-libbacktrace
 .PHONY: clean-stage4-libbacktrace maybe-clean-stage4-libbacktrace
 maybe-all-stage4-libbacktrace:
 maybe-clean-stage4-libbacktrace:
-maybe-all-stage4-libbacktrace: all-stage4-libbacktrace
-all-stage4: all-stage4-libbacktrace
-TARGET-stage4-libbacktrace = $(TARGET-libbacktrace)
-all-stage4-libbacktrace: configure-stage4-libbacktrace
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE4_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE4_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE4_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE4_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-libbacktrace)
-
-maybe-clean-stage4-libbacktrace: clean-stage4-libbacktrace
-clean-stage4: clean-stage4-libbacktrace
-clean-stage4-libbacktrace:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(HOST_SUBDIR)/libbacktrace/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage4-libbacktrace/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageprofile-libbacktrace maybe-all-stageprofile-libbacktrace
 .PHONY: clean-stageprofile-libbacktrace maybe-clean-stageprofile-libbacktrace
 maybe-all-stageprofile-libbacktrace:
 maybe-clean-stageprofile-libbacktrace:
-maybe-all-stageprofile-libbacktrace: all-stageprofile-libbacktrace
-all-stageprofile: all-stageprofile-libbacktrace
-TARGET-stageprofile-libbacktrace = $(TARGET-libbacktrace)
-all-stageprofile-libbacktrace: configure-stageprofile-libbacktrace
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-libbacktrace)
-
-maybe-clean-stageprofile-libbacktrace: clean-stageprofile-libbacktrace
-clean-stageprofile: clean-stageprofile-libbacktrace
-clean-stageprofile-libbacktrace:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/libbacktrace/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageprofile-libbacktrace/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagetrain-libbacktrace maybe-all-stagetrain-libbacktrace
 .PHONY: clean-stagetrain-libbacktrace maybe-clean-stagetrain-libbacktrace
 maybe-all-stagetrain-libbacktrace:
 maybe-clean-stagetrain-libbacktrace:
-maybe-all-stagetrain-libbacktrace: all-stagetrain-libbacktrace
-all-stagetrain: all-stagetrain-libbacktrace
-TARGET-stagetrain-libbacktrace = $(TARGET-libbacktrace)
-all-stagetrain-libbacktrace: configure-stagetrain-libbacktrace
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEtrain_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEtrain_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEtrain_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEtrain_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-libbacktrace)
-
-maybe-clean-stagetrain-libbacktrace: clean-stagetrain-libbacktrace
-clean-stagetrain: clean-stagetrain-libbacktrace
-clean-stagetrain-libbacktrace:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(HOST_SUBDIR)/libbacktrace/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagetrain-libbacktrace/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagefeedback-libbacktrace maybe-all-stagefeedback-libbacktrace
 .PHONY: clean-stagefeedback-libbacktrace maybe-clean-stagefeedback-libbacktrace
 maybe-all-stagefeedback-libbacktrace:
 maybe-clean-stagefeedback-libbacktrace:
-maybe-all-stagefeedback-libbacktrace: all-stagefeedback-libbacktrace
-all-stagefeedback: all-stagefeedback-libbacktrace
-TARGET-stagefeedback-libbacktrace = $(TARGET-libbacktrace)
-all-stagefeedback-libbacktrace: configure-stagefeedback-libbacktrace
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEfeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEfeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEfeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEfeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-libbacktrace)
-
-maybe-clean-stagefeedback-libbacktrace: clean-stagefeedback-libbacktrace
-clean-stagefeedback: clean-stagefeedback-libbacktrace
-clean-stagefeedback-libbacktrace:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/libbacktrace/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagefeedback-libbacktrace/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautoprofile-libbacktrace maybe-all-stageautoprofile-libbacktrace
 .PHONY: clean-stageautoprofile-libbacktrace maybe-clean-stageautoprofile-libbacktrace
 maybe-all-stageautoprofile-libbacktrace:
 maybe-clean-stageautoprofile-libbacktrace:
-maybe-all-stageautoprofile-libbacktrace: all-stageautoprofile-libbacktrace
-all-stageautoprofile: all-stageautoprofile-libbacktrace
-TARGET-stageautoprofile-libbacktrace = $(TARGET-libbacktrace)
-all-stageautoprofile-libbacktrace: configure-stageautoprofile-libbacktrace
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautoprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-libbacktrace)
-
-maybe-clean-stageautoprofile-libbacktrace: clean-stageautoprofile-libbacktrace
-clean-stageautoprofile: clean-stageautoprofile-libbacktrace
-clean-stageautoprofile-libbacktrace:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/libbacktrace/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautoprofile-libbacktrace/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautofeedback-libbacktrace maybe-all-stageautofeedback-libbacktrace
 .PHONY: clean-stageautofeedback-libbacktrace maybe-clean-stageautofeedback-libbacktrace
 maybe-all-stageautofeedback-libbacktrace:
 maybe-clean-stageautofeedback-libbacktrace:
-maybe-all-stageautofeedback-libbacktrace: all-stageautofeedback-libbacktrace
-all-stageautofeedback: all-stageautofeedback-libbacktrace
-TARGET-stageautofeedback-libbacktrace = $(TARGET-libbacktrace)
-all-stageautofeedback-libbacktrace: configure-stageautofeedback-libbacktrace
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautofeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-libbacktrace)
-
-maybe-clean-stageautofeedback-libbacktrace: clean-stageautofeedback-libbacktrace
-clean-stageautofeedback: clean-stageautofeedback-libbacktrace
-clean-stageautofeedback-libbacktrace:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/libbacktrace/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautofeedback-libbacktrace/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libbacktrace && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 
@@ -8209,7 +6967,6 @@ maintainer-clean-libbacktrace:
 
 .PHONY: configure-libcpp maybe-configure-libcpp
 maybe-configure-libcpp:
-configure-libcpp: stage_current
 maybe-configure-libcpp: configure-libcpp
 configure-libcpp: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -8236,281 +6993,30 @@ configure-libcpp:
 
 .PHONY: configure-stage1-libcpp maybe-configure-stage1-libcpp
 maybe-configure-stage1-libcpp:
-maybe-configure-stage1-libcpp: configure-stage1-libcpp
-configure-stage1-libcpp:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcpp/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	CFLAGS="$(STAGE1_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE1_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(HOST_SUBDIR)/libcpp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp; \
-	cd $(HOST_SUBDIR)/libcpp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcpp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcpp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage2-libcpp maybe-configure-stage2-libcpp
 maybe-configure-stage2-libcpp:
-maybe-configure-stage2-libcpp: configure-stage2-libcpp
-configure-stage2-libcpp:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcpp/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE2_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE2_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE2_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(HOST_SUBDIR)/libcpp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp; \
-	cd $(HOST_SUBDIR)/libcpp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcpp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcpp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage3-libcpp maybe-configure-stage3-libcpp
 maybe-configure-stage3-libcpp:
-maybe-configure-stage3-libcpp: configure-stage3-libcpp
-configure-stage3-libcpp:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcpp/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE3_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE3_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE3_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(HOST_SUBDIR)/libcpp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp; \
-	cd $(HOST_SUBDIR)/libcpp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcpp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcpp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage4-libcpp maybe-configure-stage4-libcpp
 maybe-configure-stage4-libcpp:
-maybe-configure-stage4-libcpp: configure-stage4-libcpp
-configure-stage4-libcpp:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcpp/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE4_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE4_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE4_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(HOST_SUBDIR)/libcpp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp; \
-	cd $(HOST_SUBDIR)/libcpp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcpp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcpp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageprofile-libcpp maybe-configure-stageprofile-libcpp
 maybe-configure-stageprofile-libcpp:
-maybe-configure-stageprofile-libcpp: configure-stageprofile-libcpp
-configure-stageprofile-libcpp:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcpp/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(HOST_SUBDIR)/libcpp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp; \
-	cd $(HOST_SUBDIR)/libcpp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcpp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcpp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagetrain-libcpp maybe-configure-stagetrain-libcpp
 maybe-configure-stagetrain-libcpp:
-maybe-configure-stagetrain-libcpp: configure-stagetrain-libcpp
-configure-stagetrain-libcpp:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcpp/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEtrain_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEtrain_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEtrain_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(HOST_SUBDIR)/libcpp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp; \
-	cd $(HOST_SUBDIR)/libcpp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcpp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcpp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagefeedback-libcpp maybe-configure-stagefeedback-libcpp
 maybe-configure-stagefeedback-libcpp:
-maybe-configure-stagefeedback-libcpp: configure-stagefeedback-libcpp
-configure-stagefeedback-libcpp:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcpp/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEfeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEfeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEfeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(HOST_SUBDIR)/libcpp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp; \
-	cd $(HOST_SUBDIR)/libcpp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcpp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcpp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautoprofile-libcpp maybe-configure-stageautoprofile-libcpp
 maybe-configure-stageautoprofile-libcpp:
-maybe-configure-stageautoprofile-libcpp: configure-stageautoprofile-libcpp
-configure-stageautoprofile-libcpp:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcpp/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautoprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautoprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(HOST_SUBDIR)/libcpp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp; \
-	cd $(HOST_SUBDIR)/libcpp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcpp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcpp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautofeedback-libcpp maybe-configure-stageautofeedback-libcpp
 maybe-configure-stageautofeedback-libcpp:
-maybe-configure-stageautofeedback-libcpp: configure-stageautofeedback-libcpp
-configure-stageautofeedback-libcpp:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcpp/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautofeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautofeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(HOST_SUBDIR)/libcpp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcpp; \
-	cd $(HOST_SUBDIR)/libcpp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcpp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcpp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS)
 
 
 
@@ -8518,7 +7024,6 @@ configure-stageautofeedback-libcpp:
 
 .PHONY: all-libcpp maybe-all-libcpp
 maybe-all-libcpp:
-all-libcpp: stage_current
 TARGET-libcpp=all
 maybe-all-libcpp: all-libcpp
 all-libcpp: configure-libcpp
@@ -8535,370 +7040,54 @@ all-libcpp: configure-libcpp
 .PHONY: clean-stage1-libcpp maybe-clean-stage1-libcpp
 maybe-all-stage1-libcpp:
 maybe-clean-stage1-libcpp:
-maybe-all-stage1-libcpp: all-stage1-libcpp
-all-stage1: all-stage1-libcpp
-TARGET-stage1-libcpp = $(TARGET-libcpp)
-all-stage1-libcpp: configure-stage1-libcpp
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcpp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE1_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE1_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE1_CXXFLAGS)" \
-		LIBCFLAGS="$(LIBCFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS)  \
-		$(STAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-libcpp)
-
-maybe-clean-stage1-libcpp: clean-stage1-libcpp
-clean-stage1: clean-stage1-libcpp
-clean-stage1-libcpp:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(HOST_SUBDIR)/libcpp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage1-libcpp/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcpp && \
-	$(MAKE) $(EXTRA_HOST_FLAGS)  \
-	$(STAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage2-libcpp maybe-all-stage2-libcpp
 .PHONY: clean-stage2-libcpp maybe-clean-stage2-libcpp
 maybe-all-stage2-libcpp:
 maybe-clean-stage2-libcpp:
-maybe-all-stage2-libcpp: all-stage2-libcpp
-all-stage2: all-stage2-libcpp
-TARGET-stage2-libcpp = $(TARGET-libcpp)
-all-stage2-libcpp: configure-stage2-libcpp
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcpp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE2_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE2_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE2_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE2_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-libcpp)
-
-maybe-clean-stage2-libcpp: clean-stage2-libcpp
-clean-stage2: clean-stage2-libcpp
-clean-stage2-libcpp:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(HOST_SUBDIR)/libcpp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage2-libcpp/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcpp && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage3-libcpp maybe-all-stage3-libcpp
 .PHONY: clean-stage3-libcpp maybe-clean-stage3-libcpp
 maybe-all-stage3-libcpp:
 maybe-clean-stage3-libcpp:
-maybe-all-stage3-libcpp: all-stage3-libcpp
-all-stage3: all-stage3-libcpp
-TARGET-stage3-libcpp = $(TARGET-libcpp)
-all-stage3-libcpp: configure-stage3-libcpp
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcpp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE3_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE3_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE3_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE3_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-libcpp)
-
-maybe-clean-stage3-libcpp: clean-stage3-libcpp
-clean-stage3: clean-stage3-libcpp
-clean-stage3-libcpp:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(HOST_SUBDIR)/libcpp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage3-libcpp/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcpp && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage4-libcpp maybe-all-stage4-libcpp
 .PHONY: clean-stage4-libcpp maybe-clean-stage4-libcpp
 maybe-all-stage4-libcpp:
 maybe-clean-stage4-libcpp:
-maybe-all-stage4-libcpp: all-stage4-libcpp
-all-stage4: all-stage4-libcpp
-TARGET-stage4-libcpp = $(TARGET-libcpp)
-all-stage4-libcpp: configure-stage4-libcpp
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcpp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE4_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE4_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE4_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE4_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-libcpp)
-
-maybe-clean-stage4-libcpp: clean-stage4-libcpp
-clean-stage4: clean-stage4-libcpp
-clean-stage4-libcpp:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(HOST_SUBDIR)/libcpp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage4-libcpp/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcpp && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageprofile-libcpp maybe-all-stageprofile-libcpp
 .PHONY: clean-stageprofile-libcpp maybe-clean-stageprofile-libcpp
 maybe-all-stageprofile-libcpp:
 maybe-clean-stageprofile-libcpp:
-maybe-all-stageprofile-libcpp: all-stageprofile-libcpp
-all-stageprofile: all-stageprofile-libcpp
-TARGET-stageprofile-libcpp = $(TARGET-libcpp)
-all-stageprofile-libcpp: configure-stageprofile-libcpp
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcpp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-libcpp)
-
-maybe-clean-stageprofile-libcpp: clean-stageprofile-libcpp
-clean-stageprofile: clean-stageprofile-libcpp
-clean-stageprofile-libcpp:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/libcpp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageprofile-libcpp/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcpp && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagetrain-libcpp maybe-all-stagetrain-libcpp
 .PHONY: clean-stagetrain-libcpp maybe-clean-stagetrain-libcpp
 maybe-all-stagetrain-libcpp:
 maybe-clean-stagetrain-libcpp:
-maybe-all-stagetrain-libcpp: all-stagetrain-libcpp
-all-stagetrain: all-stagetrain-libcpp
-TARGET-stagetrain-libcpp = $(TARGET-libcpp)
-all-stagetrain-libcpp: configure-stagetrain-libcpp
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcpp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEtrain_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEtrain_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEtrain_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEtrain_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-libcpp)
-
-maybe-clean-stagetrain-libcpp: clean-stagetrain-libcpp
-clean-stagetrain: clean-stagetrain-libcpp
-clean-stagetrain-libcpp:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(HOST_SUBDIR)/libcpp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagetrain-libcpp/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcpp && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagefeedback-libcpp maybe-all-stagefeedback-libcpp
 .PHONY: clean-stagefeedback-libcpp maybe-clean-stagefeedback-libcpp
 maybe-all-stagefeedback-libcpp:
 maybe-clean-stagefeedback-libcpp:
-maybe-all-stagefeedback-libcpp: all-stagefeedback-libcpp
-all-stagefeedback: all-stagefeedback-libcpp
-TARGET-stagefeedback-libcpp = $(TARGET-libcpp)
-all-stagefeedback-libcpp: configure-stagefeedback-libcpp
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcpp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEfeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEfeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEfeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEfeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-libcpp)
-
-maybe-clean-stagefeedback-libcpp: clean-stagefeedback-libcpp
-clean-stagefeedback: clean-stagefeedback-libcpp
-clean-stagefeedback-libcpp:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/libcpp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagefeedback-libcpp/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcpp && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautoprofile-libcpp maybe-all-stageautoprofile-libcpp
 .PHONY: clean-stageautoprofile-libcpp maybe-clean-stageautoprofile-libcpp
 maybe-all-stageautoprofile-libcpp:
 maybe-clean-stageautoprofile-libcpp:
-maybe-all-stageautoprofile-libcpp: all-stageautoprofile-libcpp
-all-stageautoprofile: all-stageautoprofile-libcpp
-TARGET-stageautoprofile-libcpp = $(TARGET-libcpp)
-all-stageautoprofile-libcpp: configure-stageautoprofile-libcpp
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcpp && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautoprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-libcpp)
-
-maybe-clean-stageautoprofile-libcpp: clean-stageautoprofile-libcpp
-clean-stageautoprofile: clean-stageautoprofile-libcpp
-clean-stageautoprofile-libcpp:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/libcpp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautoprofile-libcpp/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcpp && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautofeedback-libcpp maybe-all-stageautofeedback-libcpp
 .PHONY: clean-stageautofeedback-libcpp maybe-clean-stageautofeedback-libcpp
 maybe-all-stageautofeedback-libcpp:
 maybe-clean-stageautofeedback-libcpp:
-maybe-all-stageautofeedback-libcpp: all-stageautofeedback-libcpp
-all-stageautofeedback: all-stageautofeedback-libcpp
-TARGET-stageautofeedback-libcpp = $(TARGET-libcpp)
-all-stageautofeedback-libcpp: configure-stageautofeedback-libcpp
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcpp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautofeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-libcpp)
-
-maybe-clean-stageautofeedback-libcpp: clean-stageautofeedback-libcpp
-clean-stageautofeedback: clean-stageautofeedback-libcpp
-clean-stageautofeedback-libcpp:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/libcpp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautofeedback-libcpp/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcpp && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 
@@ -9271,7 +7460,6 @@ maintainer-clean-libcpp:
 
 .PHONY: configure-libcody maybe-configure-libcody
 maybe-configure-libcody:
-configure-libcody: stage_current
 maybe-configure-libcody: configure-libcody
 configure-libcody: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -9298,281 +7486,30 @@ configure-libcody:
 
 .PHONY: configure-stage1-libcody maybe-configure-stage1-libcody
 maybe-configure-stage1-libcody:
-maybe-configure-stage1-libcody: configure-stage1-libcody
-configure-stage1-libcody:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcody/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	CFLAGS="$(STAGE1_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE1_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(HOST_SUBDIR)/libcody; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody; \
-	cd $(HOST_SUBDIR)/libcody || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcody/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcody; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage2-libcody maybe-configure-stage2-libcody
 maybe-configure-stage2-libcody:
-maybe-configure-stage2-libcody: configure-stage2-libcody
-configure-stage2-libcody:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcody/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE2_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE2_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE2_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(HOST_SUBDIR)/libcody; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody; \
-	cd $(HOST_SUBDIR)/libcody || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcody/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcody; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage3-libcody maybe-configure-stage3-libcody
 maybe-configure-stage3-libcody:
-maybe-configure-stage3-libcody: configure-stage3-libcody
-configure-stage3-libcody:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcody/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE3_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE3_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE3_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(HOST_SUBDIR)/libcody; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody; \
-	cd $(HOST_SUBDIR)/libcody || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcody/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcody; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage4-libcody maybe-configure-stage4-libcody
 maybe-configure-stage4-libcody:
-maybe-configure-stage4-libcody: configure-stage4-libcody
-configure-stage4-libcody:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcody/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE4_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE4_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE4_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(HOST_SUBDIR)/libcody; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody; \
-	cd $(HOST_SUBDIR)/libcody || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcody/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcody; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageprofile-libcody maybe-configure-stageprofile-libcody
 maybe-configure-stageprofile-libcody:
-maybe-configure-stageprofile-libcody: configure-stageprofile-libcody
-configure-stageprofile-libcody:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcody/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(HOST_SUBDIR)/libcody; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody; \
-	cd $(HOST_SUBDIR)/libcody || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcody/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcody; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagetrain-libcody maybe-configure-stagetrain-libcody
 maybe-configure-stagetrain-libcody:
-maybe-configure-stagetrain-libcody: configure-stagetrain-libcody
-configure-stagetrain-libcody:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcody/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEtrain_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEtrain_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEtrain_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(HOST_SUBDIR)/libcody; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody; \
-	cd $(HOST_SUBDIR)/libcody || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcody/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcody; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagefeedback-libcody maybe-configure-stagefeedback-libcody
 maybe-configure-stagefeedback-libcody:
-maybe-configure-stagefeedback-libcody: configure-stagefeedback-libcody
-configure-stagefeedback-libcody:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcody/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEfeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEfeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEfeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(HOST_SUBDIR)/libcody; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody; \
-	cd $(HOST_SUBDIR)/libcody || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcody/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcody; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautoprofile-libcody maybe-configure-stageautoprofile-libcody
 maybe-configure-stageautoprofile-libcody:
-maybe-configure-stageautoprofile-libcody: configure-stageautoprofile-libcody
-configure-stageautoprofile-libcody:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcody/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautoprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautoprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(HOST_SUBDIR)/libcody; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody; \
-	cd $(HOST_SUBDIR)/libcody || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcody/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcody; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautofeedback-libcody maybe-configure-stageautofeedback-libcody
 maybe-configure-stageautofeedback-libcody:
-maybe-configure-stageautofeedback-libcody: configure-stageautofeedback-libcody
-configure-stageautofeedback-libcody:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libcody/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautofeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautofeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(HOST_SUBDIR)/libcody; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libcody; \
-	cd $(HOST_SUBDIR)/libcody || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libcody/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libcody; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS)
 
 
 
@@ -9580,7 +7517,6 @@ configure-stageautofeedback-libcody:
 
 .PHONY: all-libcody maybe-all-libcody
 maybe-all-libcody:
-all-libcody: stage_current
 TARGET-libcody=all
 maybe-all-libcody: all-libcody
 all-libcody: configure-libcody
@@ -9597,370 +7533,54 @@ all-libcody: configure-libcody
 .PHONY: clean-stage1-libcody maybe-clean-stage1-libcody
 maybe-all-stage1-libcody:
 maybe-clean-stage1-libcody:
-maybe-all-stage1-libcody: all-stage1-libcody
-all-stage1: all-stage1-libcody
-TARGET-stage1-libcody = $(TARGET-libcody)
-all-stage1-libcody: configure-stage1-libcody
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcody && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE1_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE1_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE1_CXXFLAGS)" \
-		LIBCFLAGS="$(LIBCFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS)  \
-		$(STAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-libcody)
-
-maybe-clean-stage1-libcody: clean-stage1-libcody
-clean-stage1: clean-stage1-libcody
-clean-stage1-libcody:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(HOST_SUBDIR)/libcody/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage1-libcody/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcody && \
-	$(MAKE) $(EXTRA_HOST_FLAGS)  \
-	$(STAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage2-libcody maybe-all-stage2-libcody
 .PHONY: clean-stage2-libcody maybe-clean-stage2-libcody
 maybe-all-stage2-libcody:
 maybe-clean-stage2-libcody:
-maybe-all-stage2-libcody: all-stage2-libcody
-all-stage2: all-stage2-libcody
-TARGET-stage2-libcody = $(TARGET-libcody)
-all-stage2-libcody: configure-stage2-libcody
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcody && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE2_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE2_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE2_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE2_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-libcody)
-
-maybe-clean-stage2-libcody: clean-stage2-libcody
-clean-stage2: clean-stage2-libcody
-clean-stage2-libcody:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(HOST_SUBDIR)/libcody/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage2-libcody/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcody && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage3-libcody maybe-all-stage3-libcody
 .PHONY: clean-stage3-libcody maybe-clean-stage3-libcody
 maybe-all-stage3-libcody:
 maybe-clean-stage3-libcody:
-maybe-all-stage3-libcody: all-stage3-libcody
-all-stage3: all-stage3-libcody
-TARGET-stage3-libcody = $(TARGET-libcody)
-all-stage3-libcody: configure-stage3-libcody
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcody && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE3_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE3_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE3_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE3_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-libcody)
-
-maybe-clean-stage3-libcody: clean-stage3-libcody
-clean-stage3: clean-stage3-libcody
-clean-stage3-libcody:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(HOST_SUBDIR)/libcody/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage3-libcody/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcody && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage4-libcody maybe-all-stage4-libcody
 .PHONY: clean-stage4-libcody maybe-clean-stage4-libcody
 maybe-all-stage4-libcody:
 maybe-clean-stage4-libcody:
-maybe-all-stage4-libcody: all-stage4-libcody
-all-stage4: all-stage4-libcody
-TARGET-stage4-libcody = $(TARGET-libcody)
-all-stage4-libcody: configure-stage4-libcody
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcody && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE4_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE4_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE4_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE4_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-libcody)
-
-maybe-clean-stage4-libcody: clean-stage4-libcody
-clean-stage4: clean-stage4-libcody
-clean-stage4-libcody:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(HOST_SUBDIR)/libcody/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage4-libcody/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcody && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageprofile-libcody maybe-all-stageprofile-libcody
 .PHONY: clean-stageprofile-libcody maybe-clean-stageprofile-libcody
 maybe-all-stageprofile-libcody:
 maybe-clean-stageprofile-libcody:
-maybe-all-stageprofile-libcody: all-stageprofile-libcody
-all-stageprofile: all-stageprofile-libcody
-TARGET-stageprofile-libcody = $(TARGET-libcody)
-all-stageprofile-libcody: configure-stageprofile-libcody
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcody && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-libcody)
-
-maybe-clean-stageprofile-libcody: clean-stageprofile-libcody
-clean-stageprofile: clean-stageprofile-libcody
-clean-stageprofile-libcody:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/libcody/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageprofile-libcody/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcody && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagetrain-libcody maybe-all-stagetrain-libcody
 .PHONY: clean-stagetrain-libcody maybe-clean-stagetrain-libcody
 maybe-all-stagetrain-libcody:
 maybe-clean-stagetrain-libcody:
-maybe-all-stagetrain-libcody: all-stagetrain-libcody
-all-stagetrain: all-stagetrain-libcody
-TARGET-stagetrain-libcody = $(TARGET-libcody)
-all-stagetrain-libcody: configure-stagetrain-libcody
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcody && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEtrain_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEtrain_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEtrain_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEtrain_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-libcody)
-
-maybe-clean-stagetrain-libcody: clean-stagetrain-libcody
-clean-stagetrain: clean-stagetrain-libcody
-clean-stagetrain-libcody:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(HOST_SUBDIR)/libcody/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagetrain-libcody/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcody && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagefeedback-libcody maybe-all-stagefeedback-libcody
 .PHONY: clean-stagefeedback-libcody maybe-clean-stagefeedback-libcody
 maybe-all-stagefeedback-libcody:
 maybe-clean-stagefeedback-libcody:
-maybe-all-stagefeedback-libcody: all-stagefeedback-libcody
-all-stagefeedback: all-stagefeedback-libcody
-TARGET-stagefeedback-libcody = $(TARGET-libcody)
-all-stagefeedback-libcody: configure-stagefeedback-libcody
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcody && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEfeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEfeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEfeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEfeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-libcody)
-
-maybe-clean-stagefeedback-libcody: clean-stagefeedback-libcody
-clean-stagefeedback: clean-stagefeedback-libcody
-clean-stagefeedback-libcody:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/libcody/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagefeedback-libcody/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcody && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautoprofile-libcody maybe-all-stageautoprofile-libcody
 .PHONY: clean-stageautoprofile-libcody maybe-clean-stageautoprofile-libcody
 maybe-all-stageautoprofile-libcody:
 maybe-clean-stageautoprofile-libcody:
-maybe-all-stageautoprofile-libcody: all-stageautoprofile-libcody
-all-stageautoprofile: all-stageautoprofile-libcody
-TARGET-stageautoprofile-libcody = $(TARGET-libcody)
-all-stageautoprofile-libcody: configure-stageautoprofile-libcody
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcody && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautoprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-libcody)
-
-maybe-clean-stageautoprofile-libcody: clean-stageautoprofile-libcody
-clean-stageautoprofile: clean-stageautoprofile-libcody
-clean-stageautoprofile-libcody:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/libcody/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautoprofile-libcody/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcody && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautofeedback-libcody maybe-all-stageautofeedback-libcody
 .PHONY: clean-stageautofeedback-libcody maybe-clean-stageautofeedback-libcody
 maybe-all-stageautofeedback-libcody:
 maybe-clean-stageautofeedback-libcody:
-maybe-all-stageautofeedback-libcody: all-stageautofeedback-libcody
-all-stageautofeedback: all-stageautofeedback-libcody
-TARGET-stageautofeedback-libcody = $(TARGET-libcody)
-all-stageautofeedback-libcody: configure-stageautofeedback-libcody
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libcody && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautofeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-libcody)
-
-maybe-clean-stageautofeedback-libcody: clean-stageautofeedback-libcody
-clean-stageautofeedback: clean-stageautofeedback-libcody
-clean-stageautofeedback-libcody:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/libcody/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautofeedback-libcody/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libcody && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 
@@ -10182,7 +7802,6 @@ maintainer-clean-libcody:
 
 .PHONY: configure-libdecnumber maybe-configure-libdecnumber
 maybe-configure-libdecnumber:
-configure-libdecnumber: stage_current
 maybe-configure-libdecnumber: configure-libdecnumber
 configure-libdecnumber: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -10209,281 +7828,30 @@ configure-libdecnumber:
 
 .PHONY: configure-stage1-libdecnumber maybe-configure-stage1-libdecnumber
 maybe-configure-stage1-libdecnumber:
-maybe-configure-stage1-libdecnumber: configure-stage1-libdecnumber
-configure-stage1-libdecnumber:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libdecnumber/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	CFLAGS="$(STAGE1_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE1_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(HOST_SUBDIR)/libdecnumber; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber; \
-	cd $(HOST_SUBDIR)/libdecnumber || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libdecnumber/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libdecnumber; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage2-libdecnumber maybe-configure-stage2-libdecnumber
 maybe-configure-stage2-libdecnumber:
-maybe-configure-stage2-libdecnumber: configure-stage2-libdecnumber
-configure-stage2-libdecnumber:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libdecnumber/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE2_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE2_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE2_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(HOST_SUBDIR)/libdecnumber; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber; \
-	cd $(HOST_SUBDIR)/libdecnumber || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libdecnumber/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libdecnumber; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage3-libdecnumber maybe-configure-stage3-libdecnumber
 maybe-configure-stage3-libdecnumber:
-maybe-configure-stage3-libdecnumber: configure-stage3-libdecnumber
-configure-stage3-libdecnumber:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libdecnumber/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE3_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE3_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE3_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(HOST_SUBDIR)/libdecnumber; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber; \
-	cd $(HOST_SUBDIR)/libdecnumber || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libdecnumber/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libdecnumber; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage4-libdecnumber maybe-configure-stage4-libdecnumber
 maybe-configure-stage4-libdecnumber:
-maybe-configure-stage4-libdecnumber: configure-stage4-libdecnumber
-configure-stage4-libdecnumber:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libdecnumber/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE4_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE4_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE4_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(HOST_SUBDIR)/libdecnumber; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber; \
-	cd $(HOST_SUBDIR)/libdecnumber || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libdecnumber/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libdecnumber; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageprofile-libdecnumber maybe-configure-stageprofile-libdecnumber
 maybe-configure-stageprofile-libdecnumber:
-maybe-configure-stageprofile-libdecnumber: configure-stageprofile-libdecnumber
-configure-stageprofile-libdecnumber:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libdecnumber/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(HOST_SUBDIR)/libdecnumber; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber; \
-	cd $(HOST_SUBDIR)/libdecnumber || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libdecnumber/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libdecnumber; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagetrain-libdecnumber maybe-configure-stagetrain-libdecnumber
 maybe-configure-stagetrain-libdecnumber:
-maybe-configure-stagetrain-libdecnumber: configure-stagetrain-libdecnumber
-configure-stagetrain-libdecnumber:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libdecnumber/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEtrain_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEtrain_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEtrain_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(HOST_SUBDIR)/libdecnumber; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber; \
-	cd $(HOST_SUBDIR)/libdecnumber || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libdecnumber/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libdecnumber; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagefeedback-libdecnumber maybe-configure-stagefeedback-libdecnumber
 maybe-configure-stagefeedback-libdecnumber:
-maybe-configure-stagefeedback-libdecnumber: configure-stagefeedback-libdecnumber
-configure-stagefeedback-libdecnumber:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libdecnumber/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEfeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEfeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEfeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(HOST_SUBDIR)/libdecnumber; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber; \
-	cd $(HOST_SUBDIR)/libdecnumber || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libdecnumber/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libdecnumber; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautoprofile-libdecnumber maybe-configure-stageautoprofile-libdecnumber
 maybe-configure-stageautoprofile-libdecnumber:
-maybe-configure-stageautoprofile-libdecnumber: configure-stageautoprofile-libdecnumber
-configure-stageautoprofile-libdecnumber:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libdecnumber/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautoprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautoprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(HOST_SUBDIR)/libdecnumber; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber; \
-	cd $(HOST_SUBDIR)/libdecnumber || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libdecnumber/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libdecnumber; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautofeedback-libdecnumber maybe-configure-stageautofeedback-libdecnumber
 maybe-configure-stageautofeedback-libdecnumber:
-maybe-configure-stageautofeedback-libdecnumber: configure-stageautofeedback-libdecnumber
-configure-stageautofeedback-libdecnumber:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libdecnumber/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautofeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautofeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(HOST_SUBDIR)/libdecnumber; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libdecnumber; \
-	cd $(HOST_SUBDIR)/libdecnumber || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libdecnumber/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libdecnumber; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS)
 
 
 
@@ -10491,7 +7859,6 @@ configure-stageautofeedback-libdecnumber:
 
 .PHONY: all-libdecnumber maybe-all-libdecnumber
 maybe-all-libdecnumber:
-all-libdecnumber: stage_current
 TARGET-libdecnumber=all
 maybe-all-libdecnumber: all-libdecnumber
 all-libdecnumber: configure-libdecnumber
@@ -10508,370 +7875,54 @@ all-libdecnumber: configure-libdecnumber
 .PHONY: clean-stage1-libdecnumber maybe-clean-stage1-libdecnumber
 maybe-all-stage1-libdecnumber:
 maybe-clean-stage1-libdecnumber:
-maybe-all-stage1-libdecnumber: all-stage1-libdecnumber
-all-stage1: all-stage1-libdecnumber
-TARGET-stage1-libdecnumber = $(TARGET-libdecnumber)
-all-stage1-libdecnumber: configure-stage1-libdecnumber
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE1_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE1_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE1_CXXFLAGS)" \
-		LIBCFLAGS="$(LIBCFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS)  \
-		$(STAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-libdecnumber)
-
-maybe-clean-stage1-libdecnumber: clean-stage1-libdecnumber
-clean-stage1: clean-stage1-libdecnumber
-clean-stage1-libdecnumber:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(HOST_SUBDIR)/libdecnumber/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage1-libdecnumber/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	$(MAKE) $(EXTRA_HOST_FLAGS)  \
-	$(STAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage2-libdecnumber maybe-all-stage2-libdecnumber
 .PHONY: clean-stage2-libdecnumber maybe-clean-stage2-libdecnumber
 maybe-all-stage2-libdecnumber:
 maybe-clean-stage2-libdecnumber:
-maybe-all-stage2-libdecnumber: all-stage2-libdecnumber
-all-stage2: all-stage2-libdecnumber
-TARGET-stage2-libdecnumber = $(TARGET-libdecnumber)
-all-stage2-libdecnumber: configure-stage2-libdecnumber
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE2_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE2_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE2_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE2_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-libdecnumber)
-
-maybe-clean-stage2-libdecnumber: clean-stage2-libdecnumber
-clean-stage2: clean-stage2-libdecnumber
-clean-stage2-libdecnumber:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(HOST_SUBDIR)/libdecnumber/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage2-libdecnumber/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage3-libdecnumber maybe-all-stage3-libdecnumber
 .PHONY: clean-stage3-libdecnumber maybe-clean-stage3-libdecnumber
 maybe-all-stage3-libdecnumber:
 maybe-clean-stage3-libdecnumber:
-maybe-all-stage3-libdecnumber: all-stage3-libdecnumber
-all-stage3: all-stage3-libdecnumber
-TARGET-stage3-libdecnumber = $(TARGET-libdecnumber)
-all-stage3-libdecnumber: configure-stage3-libdecnumber
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE3_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE3_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE3_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE3_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-libdecnumber)
-
-maybe-clean-stage3-libdecnumber: clean-stage3-libdecnumber
-clean-stage3: clean-stage3-libdecnumber
-clean-stage3-libdecnumber:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(HOST_SUBDIR)/libdecnumber/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage3-libdecnumber/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage4-libdecnumber maybe-all-stage4-libdecnumber
 .PHONY: clean-stage4-libdecnumber maybe-clean-stage4-libdecnumber
 maybe-all-stage4-libdecnumber:
 maybe-clean-stage4-libdecnumber:
-maybe-all-stage4-libdecnumber: all-stage4-libdecnumber
-all-stage4: all-stage4-libdecnumber
-TARGET-stage4-libdecnumber = $(TARGET-libdecnumber)
-all-stage4-libdecnumber: configure-stage4-libdecnumber
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE4_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE4_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE4_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE4_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-libdecnumber)
-
-maybe-clean-stage4-libdecnumber: clean-stage4-libdecnumber
-clean-stage4: clean-stage4-libdecnumber
-clean-stage4-libdecnumber:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(HOST_SUBDIR)/libdecnumber/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage4-libdecnumber/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageprofile-libdecnumber maybe-all-stageprofile-libdecnumber
 .PHONY: clean-stageprofile-libdecnumber maybe-clean-stageprofile-libdecnumber
 maybe-all-stageprofile-libdecnumber:
 maybe-clean-stageprofile-libdecnumber:
-maybe-all-stageprofile-libdecnumber: all-stageprofile-libdecnumber
-all-stageprofile: all-stageprofile-libdecnumber
-TARGET-stageprofile-libdecnumber = $(TARGET-libdecnumber)
-all-stageprofile-libdecnumber: configure-stageprofile-libdecnumber
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-libdecnumber)
-
-maybe-clean-stageprofile-libdecnumber: clean-stageprofile-libdecnumber
-clean-stageprofile: clean-stageprofile-libdecnumber
-clean-stageprofile-libdecnumber:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/libdecnumber/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageprofile-libdecnumber/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagetrain-libdecnumber maybe-all-stagetrain-libdecnumber
 .PHONY: clean-stagetrain-libdecnumber maybe-clean-stagetrain-libdecnumber
 maybe-all-stagetrain-libdecnumber:
 maybe-clean-stagetrain-libdecnumber:
-maybe-all-stagetrain-libdecnumber: all-stagetrain-libdecnumber
-all-stagetrain: all-stagetrain-libdecnumber
-TARGET-stagetrain-libdecnumber = $(TARGET-libdecnumber)
-all-stagetrain-libdecnumber: configure-stagetrain-libdecnumber
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEtrain_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEtrain_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEtrain_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEtrain_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-libdecnumber)
-
-maybe-clean-stagetrain-libdecnumber: clean-stagetrain-libdecnumber
-clean-stagetrain: clean-stagetrain-libdecnumber
-clean-stagetrain-libdecnumber:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(HOST_SUBDIR)/libdecnumber/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagetrain-libdecnumber/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagefeedback-libdecnumber maybe-all-stagefeedback-libdecnumber
 .PHONY: clean-stagefeedback-libdecnumber maybe-clean-stagefeedback-libdecnumber
 maybe-all-stagefeedback-libdecnumber:
 maybe-clean-stagefeedback-libdecnumber:
-maybe-all-stagefeedback-libdecnumber: all-stagefeedback-libdecnumber
-all-stagefeedback: all-stagefeedback-libdecnumber
-TARGET-stagefeedback-libdecnumber = $(TARGET-libdecnumber)
-all-stagefeedback-libdecnumber: configure-stagefeedback-libdecnumber
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEfeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEfeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEfeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEfeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-libdecnumber)
-
-maybe-clean-stagefeedback-libdecnumber: clean-stagefeedback-libdecnumber
-clean-stagefeedback: clean-stagefeedback-libdecnumber
-clean-stagefeedback-libdecnumber:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/libdecnumber/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagefeedback-libdecnumber/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautoprofile-libdecnumber maybe-all-stageautoprofile-libdecnumber
 .PHONY: clean-stageautoprofile-libdecnumber maybe-clean-stageautoprofile-libdecnumber
 maybe-all-stageautoprofile-libdecnumber:
 maybe-clean-stageautoprofile-libdecnumber:
-maybe-all-stageautoprofile-libdecnumber: all-stageautoprofile-libdecnumber
-all-stageautoprofile: all-stageautoprofile-libdecnumber
-TARGET-stageautoprofile-libdecnumber = $(TARGET-libdecnumber)
-all-stageautoprofile-libdecnumber: configure-stageautoprofile-libdecnumber
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautoprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-libdecnumber)
-
-maybe-clean-stageautoprofile-libdecnumber: clean-stageautoprofile-libdecnumber
-clean-stageautoprofile: clean-stageautoprofile-libdecnumber
-clean-stageautoprofile-libdecnumber:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/libdecnumber/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautoprofile-libdecnumber/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautofeedback-libdecnumber maybe-all-stageautofeedback-libdecnumber
 .PHONY: clean-stageautofeedback-libdecnumber maybe-clean-stageautofeedback-libdecnumber
 maybe-all-stageautofeedback-libdecnumber:
 maybe-clean-stageautofeedback-libdecnumber:
-maybe-all-stageautofeedback-libdecnumber: all-stageautofeedback-libdecnumber
-all-stageautofeedback: all-stageautofeedback-libdecnumber
-TARGET-stageautofeedback-libdecnumber = $(TARGET-libdecnumber)
-all-stageautofeedback-libdecnumber: configure-stageautofeedback-libdecnumber
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautofeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-libdecnumber)
-
-maybe-clean-stageautofeedback-libdecnumber: clean-stageautofeedback-libdecnumber
-clean-stageautofeedback: clean-stageautofeedback-libdecnumber
-clean-stageautofeedback-libdecnumber:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/libdecnumber/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautofeedback-libdecnumber/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libdecnumber && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 
@@ -11229,7 +8280,6 @@ maintainer-clean-libdecnumber:
 
 .PHONY: configure-libgui maybe-configure-libgui
 maybe-configure-libgui:
-configure-libgui: stage_current
 
 
 
@@ -11237,7 +8287,6 @@ configure-libgui: stage_current
 
 .PHONY: all-libgui maybe-all-libgui
 maybe-all-libgui:
-all-libgui: stage_current
 
 
 
@@ -11299,7 +8348,6 @@ maybe-maintainer-clean-libgui:
 
 .PHONY: configure-libiberty maybe-configure-libiberty
 maybe-configure-libiberty:
-configure-libiberty: stage_current
 maybe-configure-libiberty: configure-libiberty
 configure-libiberty: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -11326,290 +8374,30 @@ configure-libiberty:
 
 .PHONY: configure-stage1-libiberty maybe-configure-stage1-libiberty
 maybe-configure-stage1-libiberty:
-maybe-configure-stage1-libiberty: configure-stage1-libiberty
-configure-stage1-libiberty:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libiberty/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	CFLAGS="$(STAGE1_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE1_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(HOST_SUBDIR)/libiberty; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty; \
-	cd $(HOST_SUBDIR)/libiberty || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libiberty/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libiberty; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS) \
-	  --enable-shared
 
 .PHONY: configure-stage2-libiberty maybe-configure-stage2-libiberty
 maybe-configure-stage2-libiberty:
-maybe-configure-stage2-libiberty: configure-stage2-libiberty
-configure-stage2-libiberty:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libiberty/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE2_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE2_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE2_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(HOST_SUBDIR)/libiberty; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty; \
-	cd $(HOST_SUBDIR)/libiberty || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libiberty/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libiberty; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS) \
-	  --enable-shared
 
 .PHONY: configure-stage3-libiberty maybe-configure-stage3-libiberty
 maybe-configure-stage3-libiberty:
-maybe-configure-stage3-libiberty: configure-stage3-libiberty
-configure-stage3-libiberty:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libiberty/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE3_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE3_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE3_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(HOST_SUBDIR)/libiberty; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty; \
-	cd $(HOST_SUBDIR)/libiberty || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libiberty/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libiberty; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS) \
-	  --enable-shared
 
 .PHONY: configure-stage4-libiberty maybe-configure-stage4-libiberty
 maybe-configure-stage4-libiberty:
-maybe-configure-stage4-libiberty: configure-stage4-libiberty
-configure-stage4-libiberty:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libiberty/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE4_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE4_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE4_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(HOST_SUBDIR)/libiberty; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty; \
-	cd $(HOST_SUBDIR)/libiberty || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libiberty/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libiberty; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS) \
-	  --enable-shared
 
 .PHONY: configure-stageprofile-libiberty maybe-configure-stageprofile-libiberty
 maybe-configure-stageprofile-libiberty:
-maybe-configure-stageprofile-libiberty: configure-stageprofile-libiberty
-configure-stageprofile-libiberty:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libiberty/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(HOST_SUBDIR)/libiberty; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty; \
-	cd $(HOST_SUBDIR)/libiberty || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libiberty/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libiberty; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS) \
-	  --enable-shared
 
 .PHONY: configure-stagetrain-libiberty maybe-configure-stagetrain-libiberty
 maybe-configure-stagetrain-libiberty:
-maybe-configure-stagetrain-libiberty: configure-stagetrain-libiberty
-configure-stagetrain-libiberty:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libiberty/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEtrain_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEtrain_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEtrain_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(HOST_SUBDIR)/libiberty; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty; \
-	cd $(HOST_SUBDIR)/libiberty || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libiberty/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libiberty; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS) \
-	  --enable-shared
 
 .PHONY: configure-stagefeedback-libiberty maybe-configure-stagefeedback-libiberty
 maybe-configure-stagefeedback-libiberty:
-maybe-configure-stagefeedback-libiberty: configure-stagefeedback-libiberty
-configure-stagefeedback-libiberty:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libiberty/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEfeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEfeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEfeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(HOST_SUBDIR)/libiberty; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty; \
-	cd $(HOST_SUBDIR)/libiberty || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libiberty/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libiberty; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS) \
-	  --enable-shared
 
 .PHONY: configure-stageautoprofile-libiberty maybe-configure-stageautoprofile-libiberty
 maybe-configure-stageautoprofile-libiberty:
-maybe-configure-stageautoprofile-libiberty: configure-stageautoprofile-libiberty
-configure-stageautoprofile-libiberty:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libiberty/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautoprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautoprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(HOST_SUBDIR)/libiberty; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty; \
-	cd $(HOST_SUBDIR)/libiberty || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libiberty/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libiberty; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS) \
-	  --enable-shared
 
 .PHONY: configure-stageautofeedback-libiberty maybe-configure-stageautofeedback-libiberty
 maybe-configure-stageautofeedback-libiberty:
-maybe-configure-stageautofeedback-libiberty: configure-stageautofeedback-libiberty
-configure-stageautofeedback-libiberty:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/libiberty/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautofeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautofeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(HOST_SUBDIR)/libiberty; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/libiberty; \
-	cd $(HOST_SUBDIR)/libiberty || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/libiberty/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libiberty; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS) \
-	  --enable-shared
 
 
 
@@ -11617,7 +8405,6 @@ configure-stageautofeedback-libiberty:
 
 .PHONY: all-libiberty maybe-all-libiberty
 maybe-all-libiberty:
-all-libiberty: stage_current
 TARGET-libiberty=all
 maybe-all-libiberty: all-libiberty
 all-libiberty: configure-libiberty
@@ -11634,370 +8421,54 @@ all-libiberty: configure-libiberty
 .PHONY: clean-stage1-libiberty maybe-clean-stage1-libiberty
 maybe-all-stage1-libiberty:
 maybe-clean-stage1-libiberty:
-maybe-all-stage1-libiberty: all-stage1-libiberty
-all-stage1: all-stage1-libiberty
-TARGET-stage1-libiberty = $(TARGET-libiberty)
-all-stage1-libiberty: configure-stage1-libiberty
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libiberty && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE1_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE1_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE1_CXXFLAGS)" \
-		LIBCFLAGS="$(LIBCFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS)  \
-		$(STAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-libiberty)
-
-maybe-clean-stage1-libiberty: clean-stage1-libiberty
-clean-stage1: clean-stage1-libiberty
-clean-stage1-libiberty:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(HOST_SUBDIR)/libiberty/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage1-libiberty/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libiberty && \
-	$(MAKE) $(EXTRA_HOST_FLAGS)  \
-	$(STAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage2-libiberty maybe-all-stage2-libiberty
 .PHONY: clean-stage2-libiberty maybe-clean-stage2-libiberty
 maybe-all-stage2-libiberty:
 maybe-clean-stage2-libiberty:
-maybe-all-stage2-libiberty: all-stage2-libiberty
-all-stage2: all-stage2-libiberty
-TARGET-stage2-libiberty = $(TARGET-libiberty)
-all-stage2-libiberty: configure-stage2-libiberty
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libiberty && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE2_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE2_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE2_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE2_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-libiberty)
-
-maybe-clean-stage2-libiberty: clean-stage2-libiberty
-clean-stage2: clean-stage2-libiberty
-clean-stage2-libiberty:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(HOST_SUBDIR)/libiberty/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage2-libiberty/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libiberty && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage3-libiberty maybe-all-stage3-libiberty
 .PHONY: clean-stage3-libiberty maybe-clean-stage3-libiberty
 maybe-all-stage3-libiberty:
 maybe-clean-stage3-libiberty:
-maybe-all-stage3-libiberty: all-stage3-libiberty
-all-stage3: all-stage3-libiberty
-TARGET-stage3-libiberty = $(TARGET-libiberty)
-all-stage3-libiberty: configure-stage3-libiberty
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libiberty && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE3_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE3_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE3_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE3_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-libiberty)
-
-maybe-clean-stage3-libiberty: clean-stage3-libiberty
-clean-stage3: clean-stage3-libiberty
-clean-stage3-libiberty:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(HOST_SUBDIR)/libiberty/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage3-libiberty/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libiberty && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage4-libiberty maybe-all-stage4-libiberty
 .PHONY: clean-stage4-libiberty maybe-clean-stage4-libiberty
 maybe-all-stage4-libiberty:
 maybe-clean-stage4-libiberty:
-maybe-all-stage4-libiberty: all-stage4-libiberty
-all-stage4: all-stage4-libiberty
-TARGET-stage4-libiberty = $(TARGET-libiberty)
-all-stage4-libiberty: configure-stage4-libiberty
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libiberty && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE4_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE4_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE4_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE4_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-libiberty)
-
-maybe-clean-stage4-libiberty: clean-stage4-libiberty
-clean-stage4: clean-stage4-libiberty
-clean-stage4-libiberty:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(HOST_SUBDIR)/libiberty/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage4-libiberty/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libiberty && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageprofile-libiberty maybe-all-stageprofile-libiberty
 .PHONY: clean-stageprofile-libiberty maybe-clean-stageprofile-libiberty
 maybe-all-stageprofile-libiberty:
 maybe-clean-stageprofile-libiberty:
-maybe-all-stageprofile-libiberty: all-stageprofile-libiberty
-all-stageprofile: all-stageprofile-libiberty
-TARGET-stageprofile-libiberty = $(TARGET-libiberty)
-all-stageprofile-libiberty: configure-stageprofile-libiberty
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libiberty && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-libiberty)
-
-maybe-clean-stageprofile-libiberty: clean-stageprofile-libiberty
-clean-stageprofile: clean-stageprofile-libiberty
-clean-stageprofile-libiberty:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/libiberty/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageprofile-libiberty/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libiberty && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagetrain-libiberty maybe-all-stagetrain-libiberty
 .PHONY: clean-stagetrain-libiberty maybe-clean-stagetrain-libiberty
 maybe-all-stagetrain-libiberty:
 maybe-clean-stagetrain-libiberty:
-maybe-all-stagetrain-libiberty: all-stagetrain-libiberty
-all-stagetrain: all-stagetrain-libiberty
-TARGET-stagetrain-libiberty = $(TARGET-libiberty)
-all-stagetrain-libiberty: configure-stagetrain-libiberty
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libiberty && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEtrain_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEtrain_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEtrain_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEtrain_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-libiberty)
-
-maybe-clean-stagetrain-libiberty: clean-stagetrain-libiberty
-clean-stagetrain: clean-stagetrain-libiberty
-clean-stagetrain-libiberty:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(HOST_SUBDIR)/libiberty/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagetrain-libiberty/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libiberty && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagefeedback-libiberty maybe-all-stagefeedback-libiberty
 .PHONY: clean-stagefeedback-libiberty maybe-clean-stagefeedback-libiberty
 maybe-all-stagefeedback-libiberty:
 maybe-clean-stagefeedback-libiberty:
-maybe-all-stagefeedback-libiberty: all-stagefeedback-libiberty
-all-stagefeedback: all-stagefeedback-libiberty
-TARGET-stagefeedback-libiberty = $(TARGET-libiberty)
-all-stagefeedback-libiberty: configure-stagefeedback-libiberty
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libiberty && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEfeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEfeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEfeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEfeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-libiberty)
-
-maybe-clean-stagefeedback-libiberty: clean-stagefeedback-libiberty
-clean-stagefeedback: clean-stagefeedback-libiberty
-clean-stagefeedback-libiberty:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/libiberty/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagefeedback-libiberty/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libiberty && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautoprofile-libiberty maybe-all-stageautoprofile-libiberty
 .PHONY: clean-stageautoprofile-libiberty maybe-clean-stageautoprofile-libiberty
 maybe-all-stageautoprofile-libiberty:
 maybe-clean-stageautoprofile-libiberty:
-maybe-all-stageautoprofile-libiberty: all-stageautoprofile-libiberty
-all-stageautoprofile: all-stageautoprofile-libiberty
-TARGET-stageautoprofile-libiberty = $(TARGET-libiberty)
-all-stageautoprofile-libiberty: configure-stageautoprofile-libiberty
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libiberty && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautoprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-libiberty)
-
-maybe-clean-stageautoprofile-libiberty: clean-stageautoprofile-libiberty
-clean-stageautoprofile: clean-stageautoprofile-libiberty
-clean-stageautoprofile-libiberty:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/libiberty/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautoprofile-libiberty/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libiberty && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautofeedback-libiberty maybe-all-stageautofeedback-libiberty
 .PHONY: clean-stageautofeedback-libiberty maybe-clean-stageautofeedback-libiberty
 maybe-all-stageautofeedback-libiberty:
 maybe-clean-stageautofeedback-libiberty:
-maybe-all-stageautofeedback-libiberty: all-stageautofeedback-libiberty
-all-stageautofeedback: all-stageautofeedback-libiberty
-TARGET-stageautofeedback-libiberty = $(TARGET-libiberty)
-all-stageautofeedback-libiberty: configure-stageautofeedback-libiberty
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/libiberty && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautofeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-libiberty)
-
-maybe-clean-stageautofeedback-libiberty: clean-stageautofeedback-libiberty
-clean-stageautofeedback: clean-stageautofeedback-libiberty
-clean-stageautofeedback-libiberty:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/libiberty/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautofeedback-libiberty/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/libiberty && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 
@@ -12370,7 +8841,6 @@ maintainer-clean-libiberty:
 
 .PHONY: configure-libiberty-linker-plugin maybe-configure-libiberty-linker-plugin
 maybe-configure-libiberty-linker-plugin:
-configure-libiberty-linker-plugin: stage_current
 
 
 
@@ -12407,7 +8877,6 @@ maybe-configure-stageautofeedback-libiberty-linker-plugin:
 
 .PHONY: all-libiberty-linker-plugin maybe-all-libiberty-linker-plugin
 maybe-all-libiberty-linker-plugin:
-all-libiberty-linker-plugin: stage_current
 
 
 
@@ -12525,7 +8994,6 @@ maybe-maintainer-clean-libiberty-linker-plugin:
 
 .PHONY: configure-libiconv maybe-configure-libiconv
 maybe-configure-libiconv:
-configure-libiconv: stage_current
 
 
 
@@ -12562,7 +9030,6 @@ maybe-configure-stageautofeedback-libiconv:
 
 .PHONY: all-libiconv maybe-all-libiconv
 maybe-all-libiconv:
-all-libiconv: stage_current
 
 
 
@@ -12680,7 +9147,6 @@ maybe-maintainer-clean-libiconv:
 
 .PHONY: configure-m4 maybe-configure-m4
 maybe-configure-m4:
-configure-m4: stage_current
 
 
 
@@ -12688,7 +9154,6 @@ configure-m4: stage_current
 
 .PHONY: all-m4 maybe-all-m4
 maybe-all-m4:
-all-m4: stage_current
 
 
 
@@ -12750,7 +9215,6 @@ maybe-maintainer-clean-m4:
 
 .PHONY: configure-readline maybe-configure-readline
 maybe-configure-readline:
-configure-readline: stage_current
 
 
 
@@ -12758,7 +9222,6 @@ configure-readline: stage_current
 
 .PHONY: all-readline maybe-all-readline
 maybe-all-readline:
-all-readline: stage_current
 
 
 
@@ -12820,7 +9283,6 @@ maybe-maintainer-clean-readline:
 
 .PHONY: configure-sid maybe-configure-sid
 maybe-configure-sid:
-configure-sid: stage_current
 
 
 
@@ -12828,7 +9290,6 @@ configure-sid: stage_current
 
 .PHONY: all-sid maybe-all-sid
 maybe-all-sid:
-all-sid: stage_current
 
 
 
@@ -12890,7 +9351,6 @@ maybe-maintainer-clean-sid:
 
 .PHONY: configure-sim maybe-configure-sim
 maybe-configure-sim:
-configure-sim: stage_current
 
 
 
@@ -12898,7 +9358,6 @@ configure-sim: stage_current
 
 .PHONY: all-sim maybe-all-sim
 maybe-all-sim:
-all-sim: stage_current
 
 
 
@@ -12960,7 +9419,6 @@ maybe-maintainer-clean-sim:
 
 .PHONY: configure-texinfo maybe-configure-texinfo
 maybe-configure-texinfo:
-configure-texinfo: stage_current
 
 
 
@@ -12968,7 +9426,6 @@ configure-texinfo: stage_current
 
 .PHONY: all-texinfo maybe-all-texinfo
 maybe-all-texinfo:
-all-texinfo: stage_current
 
 
 
@@ -13030,7 +9487,6 @@ maybe-maintainer-clean-texinfo:
 
 .PHONY: configure-zlib maybe-configure-zlib
 maybe-configure-zlib:
-configure-zlib: stage_current
 maybe-configure-zlib: configure-zlib
 configure-zlib: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -13057,290 +9513,30 @@ configure-zlib:
 
 .PHONY: configure-stage1-zlib maybe-configure-stage1-zlib
 maybe-configure-stage1-zlib:
-maybe-configure-stage1-zlib: configure-stage1-zlib
-configure-stage1-zlib:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/zlib/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	CFLAGS="$(STAGE1_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE1_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(HOST_SUBDIR)/zlib; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib; \
-	cd $(HOST_SUBDIR)/zlib || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/zlib/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=zlib; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS) \
-	   
 
 .PHONY: configure-stage2-zlib maybe-configure-stage2-zlib
 maybe-configure-stage2-zlib:
-maybe-configure-stage2-zlib: configure-stage2-zlib
-configure-stage2-zlib:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/zlib/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE2_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE2_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE2_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(HOST_SUBDIR)/zlib; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib; \
-	cd $(HOST_SUBDIR)/zlib || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/zlib/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=zlib; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS) \
-	   
 
 .PHONY: configure-stage3-zlib maybe-configure-stage3-zlib
 maybe-configure-stage3-zlib:
-maybe-configure-stage3-zlib: configure-stage3-zlib
-configure-stage3-zlib:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/zlib/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE3_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE3_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE3_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(HOST_SUBDIR)/zlib; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib; \
-	cd $(HOST_SUBDIR)/zlib || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/zlib/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=zlib; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS) \
-	   
 
 .PHONY: configure-stage4-zlib maybe-configure-stage4-zlib
 maybe-configure-stage4-zlib:
-maybe-configure-stage4-zlib: configure-stage4-zlib
-configure-stage4-zlib:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/zlib/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE4_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE4_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE4_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(HOST_SUBDIR)/zlib; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib; \
-	cd $(HOST_SUBDIR)/zlib || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/zlib/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=zlib; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS) \
-	   
 
 .PHONY: configure-stageprofile-zlib maybe-configure-stageprofile-zlib
 maybe-configure-stageprofile-zlib:
-maybe-configure-stageprofile-zlib: configure-stageprofile-zlib
-configure-stageprofile-zlib:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/zlib/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(HOST_SUBDIR)/zlib; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib; \
-	cd $(HOST_SUBDIR)/zlib || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/zlib/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=zlib; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS) \
-	   
 
 .PHONY: configure-stagetrain-zlib maybe-configure-stagetrain-zlib
 maybe-configure-stagetrain-zlib:
-maybe-configure-stagetrain-zlib: configure-stagetrain-zlib
-configure-stagetrain-zlib:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/zlib/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEtrain_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEtrain_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEtrain_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(HOST_SUBDIR)/zlib; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib; \
-	cd $(HOST_SUBDIR)/zlib || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/zlib/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=zlib; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS) \
-	   
 
 .PHONY: configure-stagefeedback-zlib maybe-configure-stagefeedback-zlib
 maybe-configure-stagefeedback-zlib:
-maybe-configure-stagefeedback-zlib: configure-stagefeedback-zlib
-configure-stagefeedback-zlib:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/zlib/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEfeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEfeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEfeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(HOST_SUBDIR)/zlib; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib; \
-	cd $(HOST_SUBDIR)/zlib || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/zlib/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=zlib; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS) \
-	   
 
 .PHONY: configure-stageautoprofile-zlib maybe-configure-stageautoprofile-zlib
 maybe-configure-stageautoprofile-zlib:
-maybe-configure-stageautoprofile-zlib: configure-stageautoprofile-zlib
-configure-stageautoprofile-zlib:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/zlib/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautoprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautoprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(HOST_SUBDIR)/zlib; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib; \
-	cd $(HOST_SUBDIR)/zlib || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/zlib/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=zlib; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS) \
-	   
 
 .PHONY: configure-stageautofeedback-zlib maybe-configure-stageautofeedback-zlib
 maybe-configure-stageautofeedback-zlib:
-maybe-configure-stageautofeedback-zlib: configure-stageautofeedback-zlib
-configure-stageautofeedback-zlib:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/zlib/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautofeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautofeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(HOST_SUBDIR)/zlib; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/zlib; \
-	cd $(HOST_SUBDIR)/zlib || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/zlib/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=zlib; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS) \
-	   
 
 
 
@@ -13348,7 +9544,6 @@ configure-stageautofeedback-zlib:
 
 .PHONY: all-zlib maybe-all-zlib
 maybe-all-zlib:
-all-zlib: stage_current
 TARGET-zlib=all
 maybe-all-zlib: all-zlib
 all-zlib: configure-zlib
@@ -13365,370 +9560,54 @@ all-zlib: configure-zlib
 .PHONY: clean-stage1-zlib maybe-clean-stage1-zlib
 maybe-all-stage1-zlib:
 maybe-clean-stage1-zlib:
-maybe-all-stage1-zlib: all-stage1-zlib
-all-stage1: all-stage1-zlib
-TARGET-stage1-zlib = $(TARGET-zlib)
-all-stage1-zlib: configure-stage1-zlib
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/zlib && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE1_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE1_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE1_CXXFLAGS)" \
-		LIBCFLAGS="$(LIBCFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS)  \
-		$(STAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-zlib)
-
-maybe-clean-stage1-zlib: clean-stage1-zlib
-clean-stage1: clean-stage1-zlib
-clean-stage1-zlib:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(HOST_SUBDIR)/zlib/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage1-zlib/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/zlib && \
-	$(MAKE) $(EXTRA_HOST_FLAGS)  \
-	$(STAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage2-zlib maybe-all-stage2-zlib
 .PHONY: clean-stage2-zlib maybe-clean-stage2-zlib
 maybe-all-stage2-zlib:
 maybe-clean-stage2-zlib:
-maybe-all-stage2-zlib: all-stage2-zlib
-all-stage2: all-stage2-zlib
-TARGET-stage2-zlib = $(TARGET-zlib)
-all-stage2-zlib: configure-stage2-zlib
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/zlib && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE2_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE2_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE2_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE2_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-zlib)
-
-maybe-clean-stage2-zlib: clean-stage2-zlib
-clean-stage2: clean-stage2-zlib
-clean-stage2-zlib:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(HOST_SUBDIR)/zlib/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage2-zlib/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/zlib && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage3-zlib maybe-all-stage3-zlib
 .PHONY: clean-stage3-zlib maybe-clean-stage3-zlib
 maybe-all-stage3-zlib:
 maybe-clean-stage3-zlib:
-maybe-all-stage3-zlib: all-stage3-zlib
-all-stage3: all-stage3-zlib
-TARGET-stage3-zlib = $(TARGET-zlib)
-all-stage3-zlib: configure-stage3-zlib
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/zlib && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE3_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE3_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE3_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE3_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-zlib)
-
-maybe-clean-stage3-zlib: clean-stage3-zlib
-clean-stage3: clean-stage3-zlib
-clean-stage3-zlib:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(HOST_SUBDIR)/zlib/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage3-zlib/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/zlib && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage4-zlib maybe-all-stage4-zlib
 .PHONY: clean-stage4-zlib maybe-clean-stage4-zlib
 maybe-all-stage4-zlib:
 maybe-clean-stage4-zlib:
-maybe-all-stage4-zlib: all-stage4-zlib
-all-stage4: all-stage4-zlib
-TARGET-stage4-zlib = $(TARGET-zlib)
-all-stage4-zlib: configure-stage4-zlib
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/zlib && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE4_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE4_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE4_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE4_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-zlib)
-
-maybe-clean-stage4-zlib: clean-stage4-zlib
-clean-stage4: clean-stage4-zlib
-clean-stage4-zlib:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(HOST_SUBDIR)/zlib/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage4-zlib/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/zlib && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageprofile-zlib maybe-all-stageprofile-zlib
 .PHONY: clean-stageprofile-zlib maybe-clean-stageprofile-zlib
 maybe-all-stageprofile-zlib:
 maybe-clean-stageprofile-zlib:
-maybe-all-stageprofile-zlib: all-stageprofile-zlib
-all-stageprofile: all-stageprofile-zlib
-TARGET-stageprofile-zlib = $(TARGET-zlib)
-all-stageprofile-zlib: configure-stageprofile-zlib
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/zlib && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-zlib)
-
-maybe-clean-stageprofile-zlib: clean-stageprofile-zlib
-clean-stageprofile: clean-stageprofile-zlib
-clean-stageprofile-zlib:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/zlib/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageprofile-zlib/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/zlib && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagetrain-zlib maybe-all-stagetrain-zlib
 .PHONY: clean-stagetrain-zlib maybe-clean-stagetrain-zlib
 maybe-all-stagetrain-zlib:
 maybe-clean-stagetrain-zlib:
-maybe-all-stagetrain-zlib: all-stagetrain-zlib
-all-stagetrain: all-stagetrain-zlib
-TARGET-stagetrain-zlib = $(TARGET-zlib)
-all-stagetrain-zlib: configure-stagetrain-zlib
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/zlib && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEtrain_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEtrain_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEtrain_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEtrain_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-zlib)
-
-maybe-clean-stagetrain-zlib: clean-stagetrain-zlib
-clean-stagetrain: clean-stagetrain-zlib
-clean-stagetrain-zlib:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(HOST_SUBDIR)/zlib/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagetrain-zlib/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/zlib && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagefeedback-zlib maybe-all-stagefeedback-zlib
 .PHONY: clean-stagefeedback-zlib maybe-clean-stagefeedback-zlib
 maybe-all-stagefeedback-zlib:
 maybe-clean-stagefeedback-zlib:
-maybe-all-stagefeedback-zlib: all-stagefeedback-zlib
-all-stagefeedback: all-stagefeedback-zlib
-TARGET-stagefeedback-zlib = $(TARGET-zlib)
-all-stagefeedback-zlib: configure-stagefeedback-zlib
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/zlib && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEfeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEfeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEfeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEfeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-zlib)
-
-maybe-clean-stagefeedback-zlib: clean-stagefeedback-zlib
-clean-stagefeedback: clean-stagefeedback-zlib
-clean-stagefeedback-zlib:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/zlib/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagefeedback-zlib/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/zlib && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautoprofile-zlib maybe-all-stageautoprofile-zlib
 .PHONY: clean-stageautoprofile-zlib maybe-clean-stageautoprofile-zlib
 maybe-all-stageautoprofile-zlib:
 maybe-clean-stageautoprofile-zlib:
-maybe-all-stageautoprofile-zlib: all-stageautoprofile-zlib
-all-stageautoprofile: all-stageautoprofile-zlib
-TARGET-stageautoprofile-zlib = $(TARGET-zlib)
-all-stageautoprofile-zlib: configure-stageautoprofile-zlib
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/zlib && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautoprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-zlib)
-
-maybe-clean-stageautoprofile-zlib: clean-stageautoprofile-zlib
-clean-stageautoprofile: clean-stageautoprofile-zlib
-clean-stageautoprofile-zlib:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/zlib/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautoprofile-zlib/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/zlib && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautofeedback-zlib maybe-all-stageautofeedback-zlib
 .PHONY: clean-stageautofeedback-zlib maybe-clean-stageautofeedback-zlib
 maybe-all-stageautofeedback-zlib:
 maybe-clean-stageautofeedback-zlib:
-maybe-all-stageautofeedback-zlib: all-stageautofeedback-zlib
-all-stageautofeedback: all-stageautofeedback-zlib
-TARGET-stageautofeedback-zlib = $(TARGET-zlib)
-all-stageautofeedback-zlib: configure-stageautofeedback-zlib
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/zlib && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautofeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-zlib)
-
-maybe-clean-stageautofeedback-zlib: clean-stageautofeedback-zlib
-clean-stageautofeedback: clean-stageautofeedback-zlib
-clean-stageautofeedback-zlib:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/zlib/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautofeedback-zlib/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/zlib && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 
@@ -14083,7 +9962,6 @@ maintainer-clean-zlib:
 
 .PHONY: configure-gnulib maybe-configure-gnulib
 maybe-configure-gnulib:
-configure-gnulib: stage_current
 
 
 
@@ -14091,7 +9969,6 @@ configure-gnulib: stage_current
 
 .PHONY: all-gnulib maybe-all-gnulib
 maybe-all-gnulib:
-all-gnulib: stage_current
 
 
 
@@ -14153,7 +10030,6 @@ maybe-maintainer-clean-gnulib:
 
 .PHONY: configure-gdbsupport maybe-configure-gdbsupport
 maybe-configure-gdbsupport:
-configure-gdbsupport: stage_current
 
 
 
@@ -14161,7 +10037,6 @@ configure-gdbsupport: stage_current
 
 .PHONY: all-gdbsupport maybe-all-gdbsupport
 maybe-all-gdbsupport:
-all-gdbsupport: stage_current
 
 
 
@@ -14223,7 +10098,6 @@ maybe-maintainer-clean-gdbsupport:
 
 .PHONY: configure-gdbserver maybe-configure-gdbserver
 maybe-configure-gdbserver:
-configure-gdbserver: stage_current
 
 
 
@@ -14231,7 +10105,6 @@ configure-gdbserver: stage_current
 
 .PHONY: all-gdbserver maybe-all-gdbserver
 maybe-all-gdbserver:
-all-gdbserver: stage_current
 
 
 
@@ -14293,7 +10166,6 @@ maybe-maintainer-clean-gdbserver:
 
 .PHONY: configure-gdb maybe-configure-gdb
 maybe-configure-gdb:
-configure-gdb: stage_current
 
 
 
@@ -14301,7 +10173,6 @@ configure-gdb: stage_current
 
 .PHONY: all-gdb maybe-all-gdb
 maybe-all-gdb:
-all-gdb: stage_current
 
 
 
@@ -14363,7 +10234,6 @@ maybe-maintainer-clean-gdb:
 
 .PHONY: configure-expect maybe-configure-expect
 maybe-configure-expect:
-configure-expect: stage_current
 
 
 
@@ -14371,7 +10241,6 @@ configure-expect: stage_current
 
 .PHONY: all-expect maybe-all-expect
 maybe-all-expect:
-all-expect: stage_current
 
 
 
@@ -14433,7 +10302,6 @@ maybe-maintainer-clean-expect:
 
 .PHONY: configure-guile maybe-configure-guile
 maybe-configure-guile:
-configure-guile: stage_current
 
 
 
@@ -14441,7 +10309,6 @@ configure-guile: stage_current
 
 .PHONY: all-guile maybe-all-guile
 maybe-all-guile:
-all-guile: stage_current
 
 
 
@@ -14503,7 +10370,6 @@ maybe-maintainer-clean-guile:
 
 .PHONY: configure-tk maybe-configure-tk
 maybe-configure-tk:
-configure-tk: stage_current
 
 
 
@@ -14511,7 +10377,6 @@ configure-tk: stage_current
 
 .PHONY: all-tk maybe-all-tk
 maybe-all-tk:
-all-tk: stage_current
 
 
 
@@ -14573,7 +10438,6 @@ maybe-maintainer-clean-tk:
 
 .PHONY: configure-libtermcap maybe-configure-libtermcap
 maybe-configure-libtermcap:
-configure-libtermcap: stage_current
 
 
 
@@ -14581,7 +10445,6 @@ configure-libtermcap: stage_current
 
 .PHONY: all-libtermcap maybe-all-libtermcap
 maybe-all-libtermcap:
-all-libtermcap: stage_current
 
 
 
@@ -14643,7 +10506,6 @@ maybe-maintainer-clean-libtermcap:
 
 .PHONY: configure-utils maybe-configure-utils
 maybe-configure-utils:
-configure-utils: stage_current
 
 
 
@@ -14651,7 +10513,6 @@ configure-utils: stage_current
 
 .PHONY: all-utils maybe-all-utils
 maybe-all-utils:
-all-utils: stage_current
 
 
 
@@ -14713,7 +10574,6 @@ maybe-maintainer-clean-utils:
 
 .PHONY: configure-c++tools maybe-configure-c++tools
 maybe-configure-c++tools:
-configure-c++tools: stage_current
 maybe-configure-c++tools: configure-c++tools
 configure-c++tools: 
 	@: $(MAKE); $(unstage)
@@ -14743,7 +10603,6 @@ configure-c++tools:
 
 .PHONY: all-c++tools maybe-all-c++tools
 maybe-all-c++tools:
-all-c++tools: stage_current
 TARGET-c++tools=all
 maybe-all-c++tools: all-c++tools
 all-c++tools: configure-c++tools
@@ -15123,7 +10982,6 @@ maintainer-clean-c++tools:
 
 .PHONY: configure-gnattools maybe-configure-gnattools
 maybe-configure-gnattools:
-configure-gnattools: stage_current
 
 
 
@@ -15131,7 +10989,6 @@ configure-gnattools: stage_current
 
 .PHONY: all-gnattools maybe-all-gnattools
 maybe-all-gnattools:
-all-gnattools: stage_current
 
 
 
@@ -15193,7 +11050,6 @@ maybe-maintainer-clean-gnattools:
 
 .PHONY: configure-lto-plugin maybe-configure-lto-plugin
 maybe-configure-lto-plugin:
-configure-lto-plugin: stage_current
 maybe-configure-lto-plugin: configure-lto-plugin
 configure-lto-plugin: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -15220,290 +11076,30 @@ configure-lto-plugin:
 
 .PHONY: configure-stage1-lto-plugin maybe-configure-stage1-lto-plugin
 maybe-configure-stage1-lto-plugin:
-maybe-configure-stage1-lto-plugin: configure-stage1-lto-plugin
-configure-stage1-lto-plugin:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/lto-plugin/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	CFLAGS="$(STAGE1_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE1_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(HOST_SUBDIR)/lto-plugin; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin; \
-	cd $(HOST_SUBDIR)/lto-plugin || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/lto-plugin/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=lto-plugin; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS) \
-	  --enable-shared  
 
 .PHONY: configure-stage2-lto-plugin maybe-configure-stage2-lto-plugin
 maybe-configure-stage2-lto-plugin:
-maybe-configure-stage2-lto-plugin: configure-stage2-lto-plugin
-configure-stage2-lto-plugin:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/lto-plugin/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE2_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE2_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE2_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(HOST_SUBDIR)/lto-plugin; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin; \
-	cd $(HOST_SUBDIR)/lto-plugin || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/lto-plugin/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=lto-plugin; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS) \
-	  --enable-shared  
 
 .PHONY: configure-stage3-lto-plugin maybe-configure-stage3-lto-plugin
 maybe-configure-stage3-lto-plugin:
-maybe-configure-stage3-lto-plugin: configure-stage3-lto-plugin
-configure-stage3-lto-plugin:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/lto-plugin/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE3_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE3_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE3_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(HOST_SUBDIR)/lto-plugin; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin; \
-	cd $(HOST_SUBDIR)/lto-plugin || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/lto-plugin/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=lto-plugin; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS) \
-	  --enable-shared  
 
 .PHONY: configure-stage4-lto-plugin maybe-configure-stage4-lto-plugin
 maybe-configure-stage4-lto-plugin:
-maybe-configure-stage4-lto-plugin: configure-stage4-lto-plugin
-configure-stage4-lto-plugin:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/lto-plugin/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGE4_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGE4_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGE4_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(HOST_SUBDIR)/lto-plugin; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin; \
-	cd $(HOST_SUBDIR)/lto-plugin || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/lto-plugin/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=lto-plugin; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS) \
-	  --enable-shared  
 
 .PHONY: configure-stageprofile-lto-plugin maybe-configure-stageprofile-lto-plugin
 maybe-configure-stageprofile-lto-plugin:
-maybe-configure-stageprofile-lto-plugin: configure-stageprofile-lto-plugin
-configure-stageprofile-lto-plugin:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/lto-plugin/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(HOST_SUBDIR)/lto-plugin; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin; \
-	cd $(HOST_SUBDIR)/lto-plugin || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/lto-plugin/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=lto-plugin; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS) \
-	  --enable-shared  
 
 .PHONY: configure-stagetrain-lto-plugin maybe-configure-stagetrain-lto-plugin
 maybe-configure-stagetrain-lto-plugin:
-maybe-configure-stagetrain-lto-plugin: configure-stagetrain-lto-plugin
-configure-stagetrain-lto-plugin:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/lto-plugin/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEtrain_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEtrain_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEtrain_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(HOST_SUBDIR)/lto-plugin; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin; \
-	cd $(HOST_SUBDIR)/lto-plugin || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/lto-plugin/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=lto-plugin; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS) \
-	  --enable-shared  
 
 .PHONY: configure-stagefeedback-lto-plugin maybe-configure-stagefeedback-lto-plugin
 maybe-configure-stagefeedback-lto-plugin:
-maybe-configure-stagefeedback-lto-plugin: configure-stagefeedback-lto-plugin
-configure-stagefeedback-lto-plugin:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/lto-plugin/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEfeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEfeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEfeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(HOST_SUBDIR)/lto-plugin; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin; \
-	cd $(HOST_SUBDIR)/lto-plugin || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/lto-plugin/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=lto-plugin; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS) \
-	  --enable-shared  
 
 .PHONY: configure-stageautoprofile-lto-plugin maybe-configure-stageautoprofile-lto-plugin
 maybe-configure-stageautoprofile-lto-plugin:
-maybe-configure-stageautoprofile-lto-plugin: configure-stageautoprofile-lto-plugin
-configure-stageautoprofile-lto-plugin:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/lto-plugin/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautoprofile_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautoprofile_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(HOST_SUBDIR)/lto-plugin; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin; \
-	cd $(HOST_SUBDIR)/lto-plugin || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/lto-plugin/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=lto-plugin; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS) \
-	  --enable-shared  
 
 .PHONY: configure-stageautofeedback-lto-plugin maybe-configure-stageautofeedback-lto-plugin
 maybe-configure-stageautofeedback-lto-plugin:
-maybe-configure-stageautofeedback-lto-plugin: configure-stageautofeedback-lto-plugin
-configure-stageautofeedback-lto-plugin:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	test ! -f $(HOST_SUBDIR)/lto-plugin/Makefile || exit 0; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS) \
-	CFLAGS="$(STAGEautofeedback_CFLAGS)"; export CFLAGS; \
-	CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)"; export CXXFLAGS; \
-	LIBCFLAGS="$(STAGEautofeedback_CFLAGS)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(HOST_SUBDIR)/lto-plugin; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(HOST_SUBDIR)/lto-plugin; \
-	cd $(HOST_SUBDIR)/lto-plugin || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(HOST_SUBDIR)/lto-plugin/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=lto-plugin; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS) \
-	  --enable-shared  
 
 
 
@@ -15511,7 +11107,6 @@ configure-stageautofeedback-lto-plugin:
 
 .PHONY: all-lto-plugin maybe-all-lto-plugin
 maybe-all-lto-plugin:
-all-lto-plugin: stage_current
 TARGET-lto-plugin=all
 maybe-all-lto-plugin: all-lto-plugin
 all-lto-plugin: configure-lto-plugin
@@ -15528,370 +11123,54 @@ all-lto-plugin: configure-lto-plugin
 .PHONY: clean-stage1-lto-plugin maybe-clean-stage1-lto-plugin
 maybe-all-stage1-lto-plugin:
 maybe-clean-stage1-lto-plugin:
-maybe-all-stage1-lto-plugin: all-stage1-lto-plugin
-all-stage1: all-stage1-lto-plugin
-TARGET-stage1-lto-plugin = $(TARGET-lto-plugin)
-all-stage1-lto-plugin: configure-stage1-lto-plugin
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE1_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE1_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE1_CXXFLAGS)" \
-		LIBCFLAGS="$(LIBCFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS)  \
-		$(STAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-lto-plugin)
-
-maybe-clean-stage1-lto-plugin: clean-stage1-lto-plugin
-clean-stage1: clean-stage1-lto-plugin
-clean-stage1-lto-plugin:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(HOST_SUBDIR)/lto-plugin/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage1-lto-plugin/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	$(MAKE) $(EXTRA_HOST_FLAGS)  \
-	$(STAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage2-lto-plugin maybe-all-stage2-lto-plugin
 .PHONY: clean-stage2-lto-plugin maybe-clean-stage2-lto-plugin
 maybe-all-stage2-lto-plugin:
 maybe-clean-stage2-lto-plugin:
-maybe-all-stage2-lto-plugin: all-stage2-lto-plugin
-all-stage2: all-stage2-lto-plugin
-TARGET-stage2-lto-plugin = $(TARGET-lto-plugin)
-all-stage2-lto-plugin: configure-stage2-lto-plugin
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE2_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE2_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE2_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE2_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-lto-plugin)
-
-maybe-clean-stage2-lto-plugin: clean-stage2-lto-plugin
-clean-stage2: clean-stage2-lto-plugin
-clean-stage2-lto-plugin:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(HOST_SUBDIR)/lto-plugin/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage2-lto-plugin/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage3-lto-plugin maybe-all-stage3-lto-plugin
 .PHONY: clean-stage3-lto-plugin maybe-clean-stage3-lto-plugin
 maybe-all-stage3-lto-plugin:
 maybe-clean-stage3-lto-plugin:
-maybe-all-stage3-lto-plugin: all-stage3-lto-plugin
-all-stage3: all-stage3-lto-plugin
-TARGET-stage3-lto-plugin = $(TARGET-lto-plugin)
-all-stage3-lto-plugin: configure-stage3-lto-plugin
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE3_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE3_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE3_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE3_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-lto-plugin)
-
-maybe-clean-stage3-lto-plugin: clean-stage3-lto-plugin
-clean-stage3: clean-stage3-lto-plugin
-clean-stage3-lto-plugin:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(HOST_SUBDIR)/lto-plugin/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage3-lto-plugin/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stage4-lto-plugin maybe-all-stage4-lto-plugin
 .PHONY: clean-stage4-lto-plugin maybe-clean-stage4-lto-plugin
 maybe-all-stage4-lto-plugin:
 maybe-clean-stage4-lto-plugin:
-maybe-all-stage4-lto-plugin: all-stage4-lto-plugin
-all-stage4: all-stage4-lto-plugin
-TARGET-stage4-lto-plugin = $(TARGET-lto-plugin)
-all-stage4-lto-plugin: configure-stage4-lto-plugin
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGE4_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE4_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGE4_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGE4_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-lto-plugin)
-
-maybe-clean-stage4-lto-plugin: clean-stage4-lto-plugin
-clean-stage4: clean-stage4-lto-plugin
-clean-stage4-lto-plugin:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(HOST_SUBDIR)/lto-plugin/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stage4-lto-plugin/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageprofile-lto-plugin maybe-all-stageprofile-lto-plugin
 .PHONY: clean-stageprofile-lto-plugin maybe-clean-stageprofile-lto-plugin
 maybe-all-stageprofile-lto-plugin:
 maybe-clean-stageprofile-lto-plugin:
-maybe-all-stageprofile-lto-plugin: all-stageprofile-lto-plugin
-all-stageprofile: all-stageprofile-lto-plugin
-TARGET-stageprofile-lto-plugin = $(TARGET-lto-plugin)
-all-stageprofile-lto-plugin: configure-stageprofile-lto-plugin
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-lto-plugin)
-
-maybe-clean-stageprofile-lto-plugin: clean-stageprofile-lto-plugin
-clean-stageprofile: clean-stageprofile-lto-plugin
-clean-stageprofile-lto-plugin:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/lto-plugin/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageprofile-lto-plugin/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagetrain-lto-plugin maybe-all-stagetrain-lto-plugin
 .PHONY: clean-stagetrain-lto-plugin maybe-clean-stagetrain-lto-plugin
 maybe-all-stagetrain-lto-plugin:
 maybe-clean-stagetrain-lto-plugin:
-maybe-all-stagetrain-lto-plugin: all-stagetrain-lto-plugin
-all-stagetrain: all-stagetrain-lto-plugin
-TARGET-stagetrain-lto-plugin = $(TARGET-lto-plugin)
-all-stagetrain-lto-plugin: configure-stagetrain-lto-plugin
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEtrain_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEtrain_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEtrain_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEtrain_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-lto-plugin)
-
-maybe-clean-stagetrain-lto-plugin: clean-stagetrain-lto-plugin
-clean-stagetrain: clean-stagetrain-lto-plugin
-clean-stagetrain-lto-plugin:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(HOST_SUBDIR)/lto-plugin/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagetrain-lto-plugin/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stagefeedback-lto-plugin maybe-all-stagefeedback-lto-plugin
 .PHONY: clean-stagefeedback-lto-plugin maybe-clean-stagefeedback-lto-plugin
 maybe-all-stagefeedback-lto-plugin:
 maybe-clean-stagefeedback-lto-plugin:
-maybe-all-stagefeedback-lto-plugin: all-stagefeedback-lto-plugin
-all-stagefeedback: all-stagefeedback-lto-plugin
-TARGET-stagefeedback-lto-plugin = $(TARGET-lto-plugin)
-all-stagefeedback-lto-plugin: configure-stagefeedback-lto-plugin
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEfeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEfeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEfeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEfeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-lto-plugin)
-
-maybe-clean-stagefeedback-lto-plugin: clean-stagefeedback-lto-plugin
-clean-stagefeedback: clean-stagefeedback-lto-plugin
-clean-stagefeedback-lto-plugin:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/lto-plugin/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stagefeedback-lto-plugin/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautoprofile-lto-plugin maybe-all-stageautoprofile-lto-plugin
 .PHONY: clean-stageautoprofile-lto-plugin maybe-clean-stageautoprofile-lto-plugin
 maybe-all-stageautoprofile-lto-plugin:
 maybe-clean-stageautoprofile-lto-plugin:
-maybe-all-stageautoprofile-lto-plugin: all-stageautoprofile-lto-plugin
-all-stageautoprofile: all-stageautoprofile-lto-plugin
-TARGET-stageautoprofile-lto-plugin = $(TARGET-lto-plugin)
-all-stageautoprofile-lto-plugin: configure-stageautoprofile-lto-plugin
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautoprofile_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautoprofile_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautoprofile_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-lto-plugin)
-
-maybe-clean-stageautoprofile-lto-plugin: clean-stageautoprofile-lto-plugin
-clean-stageautoprofile: clean-stageautoprofile-lto-plugin
-clean-stageautoprofile-lto-plugin:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(HOST_SUBDIR)/lto-plugin/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautoprofile-lto-plugin/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 .PHONY: all-stageautofeedback-lto-plugin maybe-all-stageautofeedback-lto-plugin
 .PHONY: clean-stageautofeedback-lto-plugin maybe-clean-stageautofeedback-lto-plugin
 maybe-all-stageautofeedback-lto-plugin:
 maybe-clean-stageautofeedback-lto-plugin:
-maybe-all-stageautofeedback-lto-plugin: all-stageautofeedback-lto-plugin
-all-stageautofeedback: all-stageautofeedback-lto-plugin
-TARGET-stageautofeedback-lto-plugin = $(TARGET-lto-plugin)
-all-stageautofeedback-lto-plugin: configure-stageautofeedback-lto-plugin
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(HOST_EXPORTS) \
-	$(POSTSTAGE1_HOST_EXPORTS)  \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGEautofeedback_GENERATOR_CFLAGS)" \
-		CXXFLAGS="$(STAGEautofeedback_CXXFLAGS)" \
-		LIBCFLAGS="$(STAGEautofeedback_CFLAGS)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-lto-plugin)
-
-maybe-clean-stageautofeedback-lto-plugin: clean-stageautofeedback-lto-plugin
-clean-stageautofeedback: clean-stageautofeedback-lto-plugin
-clean-stageautofeedback-lto-plugin:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(HOST_SUBDIR)/lto-plugin/Makefile ] || exit 0; \
-	else \
-	  [ -f $(HOST_SUBDIR)/stageautofeedback-lto-plugin/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(HOST_SUBDIR)/lto-plugin && \
-	$(MAKE) $(EXTRA_HOST_FLAGS) $(POSTSTAGE1_FLAGS_TO_PASS)  clean
 
 
 
@@ -16264,7 +11543,6 @@ maintainer-clean-lto-plugin:
 
 .PHONY: configure-libcc1 maybe-configure-libcc1
 maybe-configure-libcc1:
-configure-libcc1: stage_current
 maybe-configure-libcc1: configure-libcc1
 configure-libcc1: 
 	@: $(MAKE); $(unstage)
@@ -16294,7 +11572,6 @@ configure-libcc1:
 
 .PHONY: all-libcc1 maybe-all-libcc1
 maybe-all-libcc1:
-all-libcc1: stage_current
 TARGET-libcc1=all
 maybe-all-libcc1: all-libcc1
 all-libcc1: configure-libcc1
@@ -16690,7 +11967,6 @@ maintainer-clean-libcc1:
 
 .PHONY: configure-gotools maybe-configure-gotools
 maybe-configure-gotools:
-configure-gotools: stage_current
 
 
 
@@ -16698,7 +11974,6 @@ configure-gotools: stage_current
 
 .PHONY: all-gotools maybe-all-gotools
 maybe-all-gotools:
-all-gotools: stage_current
 
 
 
@@ -16760,7 +12035,6 @@ maybe-maintainer-clean-gotools:
 
 .PHONY: configure-libctf maybe-configure-libctf
 maybe-configure-libctf:
-configure-libctf: stage_current
 
 
 
@@ -16797,7 +12071,6 @@ maybe-configure-stageautofeedback-libctf:
 
 .PHONY: all-libctf maybe-all-libctf
 maybe-all-libctf:
-all-libctf: stage_current
 
 
 
@@ -16915,7 +12188,6 @@ maybe-maintainer-clean-libctf:
 
 .PHONY: configure-libsframe maybe-configure-libsframe
 maybe-configure-libsframe:
-configure-libsframe: stage_current
 
 
 
@@ -16952,7 +12224,6 @@ maybe-configure-stageautofeedback-libsframe:
 
 .PHONY: all-libsframe maybe-all-libsframe
 maybe-all-libsframe:
-all-libsframe: stage_current
 
 
 
@@ -17070,7 +12341,6 @@ maybe-maintainer-clean-libsframe:
 
 .PHONY: configure-libgrust maybe-configure-libgrust
 maybe-configure-libgrust:
-configure-libgrust: stage_current
 
 
 
@@ -17107,7 +12377,6 @@ maybe-configure-stageautofeedback-libgrust:
 
 .PHONY: all-libgrust maybe-all-libgrust
 maybe-all-libgrust:
-all-libgrust: stage_current
 
 
 
@@ -17232,7 +12501,6 @@ maybe-maintainer-clean-libgrust:
 
 .PHONY: configure-target-libstdc++-v3 maybe-configure-target-libstdc++-v3
 maybe-configure-target-libstdc++-v3:
-configure-target-libstdc++-v3: stage_current
 maybe-configure-target-libstdc++-v3: configure-target-libstdc++-v3
 configure-target-libstdc++-v3: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -17273,389 +12541,30 @@ configure-target-libstdc++-v3:
 
 .PHONY: configure-stage1-target-libstdc++-v3 maybe-configure-stage1-target-libstdc++-v3
 maybe-configure-stage1-target-libstdc++-v3:
-maybe-configure-stage1-target-libstdc++-v3: configure-stage1-target-libstdc++-v3
-configure-stage1-target-libstdc++-v3:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	echo "Checking multilib configuration for libstdc++-v3..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
-	    mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile || exit 0; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(TARGET_SUBDIR)/libstdc++-v3; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libstdc++-v3/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libstdc++-v3; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage2-target-libstdc++-v3 maybe-configure-stage2-target-libstdc++-v3
 maybe-configure-stage2-target-libstdc++-v3:
-maybe-configure-stage2-target-libstdc++-v3: configure-stage2-target-libstdc++-v3
-configure-stage2-target-libstdc++-v3:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	echo "Checking multilib configuration for libstdc++-v3..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
-	    mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile || exit 0; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(TARGET_SUBDIR)/libstdc++-v3; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libstdc++-v3/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libstdc++-v3; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage3-target-libstdc++-v3 maybe-configure-stage3-target-libstdc++-v3
 maybe-configure-stage3-target-libstdc++-v3:
-maybe-configure-stage3-target-libstdc++-v3: configure-stage3-target-libstdc++-v3
-configure-stage3-target-libstdc++-v3:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	echo "Checking multilib configuration for libstdc++-v3..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
-	    mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile || exit 0; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(TARGET_SUBDIR)/libstdc++-v3; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libstdc++-v3/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libstdc++-v3; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage4-target-libstdc++-v3 maybe-configure-stage4-target-libstdc++-v3
 maybe-configure-stage4-target-libstdc++-v3:
-maybe-configure-stage4-target-libstdc++-v3: configure-stage4-target-libstdc++-v3
-configure-stage4-target-libstdc++-v3:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	echo "Checking multilib configuration for libstdc++-v3..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
-	    mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile || exit 0; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(TARGET_SUBDIR)/libstdc++-v3; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libstdc++-v3/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libstdc++-v3; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageprofile-target-libstdc++-v3 maybe-configure-stageprofile-target-libstdc++-v3
 maybe-configure-stageprofile-target-libstdc++-v3:
-maybe-configure-stageprofile-target-libstdc++-v3: configure-stageprofile-target-libstdc++-v3
-configure-stageprofile-target-libstdc++-v3:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	echo "Checking multilib configuration for libstdc++-v3..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
-	    mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile || exit 0; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(TARGET_SUBDIR)/libstdc++-v3; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libstdc++-v3/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libstdc++-v3; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagetrain-target-libstdc++-v3 maybe-configure-stagetrain-target-libstdc++-v3
 maybe-configure-stagetrain-target-libstdc++-v3:
-maybe-configure-stagetrain-target-libstdc++-v3: configure-stagetrain-target-libstdc++-v3
-configure-stagetrain-target-libstdc++-v3:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	echo "Checking multilib configuration for libstdc++-v3..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
-	    mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile || exit 0; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(TARGET_SUBDIR)/libstdc++-v3; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libstdc++-v3/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libstdc++-v3; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagefeedback-target-libstdc++-v3 maybe-configure-stagefeedback-target-libstdc++-v3
 maybe-configure-stagefeedback-target-libstdc++-v3:
-maybe-configure-stagefeedback-target-libstdc++-v3: configure-stagefeedback-target-libstdc++-v3
-configure-stagefeedback-target-libstdc++-v3:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	echo "Checking multilib configuration for libstdc++-v3..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
-	    mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile || exit 0; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(TARGET_SUBDIR)/libstdc++-v3; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libstdc++-v3/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libstdc++-v3; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautoprofile-target-libstdc++-v3 maybe-configure-stageautoprofile-target-libstdc++-v3
 maybe-configure-stageautoprofile-target-libstdc++-v3:
-maybe-configure-stageautoprofile-target-libstdc++-v3: configure-stageautoprofile-target-libstdc++-v3
-configure-stageautoprofile-target-libstdc++-v3:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	echo "Checking multilib configuration for libstdc++-v3..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
-	    mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile || exit 0; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(TARGET_SUBDIR)/libstdc++-v3; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libstdc++-v3/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libstdc++-v3; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautofeedback-target-libstdc++-v3 maybe-configure-stageautofeedback-target-libstdc++-v3
 maybe-configure-stageautofeedback-target-libstdc++-v3:
-maybe-configure-stageautofeedback-target-libstdc++-v3: configure-stageautofeedback-target-libstdc++-v3
-configure-stageautofeedback-target-libstdc++-v3:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	echo "Checking multilib configuration for libstdc++-v3..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
-	    mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libstdc++-v3/multilib.tmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile || exit 0; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(TARGET_SUBDIR)/libstdc++-v3; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libstdc++-v3; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libstdc++-v3/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libstdc++-v3; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS)
 
 
 
@@ -17663,7 +12572,6 @@ configure-stageautofeedback-target-libstdc++-v3:
 
 .PHONY: all-target-libstdc++-v3 maybe-all-target-libstdc++-v3
 maybe-all-target-libstdc++-v3:
-all-target-libstdc++-v3: stage_current
 TARGET-target-libstdc++-v3=all
 maybe-all-target-libstdc++-v3: all-target-libstdc++-v3
 all-target-libstdc++-v3: configure-target-libstdc++-v3
@@ -17680,361 +12588,54 @@ all-target-libstdc++-v3: configure-target-libstdc++-v3
 .PHONY: clean-stage1-target-libstdc++-v3 maybe-clean-stage1-target-libstdc++-v3
 maybe-all-stage1-target-libstdc++-v3:
 maybe-clean-stage1-target-libstdc++-v3:
-maybe-all-stage1-target-libstdc++-v3: all-stage1-target-libstdc++-v3
-all-stage1: all-stage1-target-libstdc++-v3
-TARGET-stage1-target-libstdc++-v3 = $(TARGET-target-libstdc++-v3)
-all-stage1-target-libstdc++-v3: configure-stage1-target-libstdc++-v3
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(RAW_CXX_TARGET_EXPORTS)  \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'  \
-		  \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-target-libstdc++-v3)
-
-maybe-clean-stage1-target-libstdc++-v3: clean-stage1-target-libstdc++-v3
-clean-stage1: clean-stage1-target-libstdc++-v3
-clean-stage1-target-libstdc++-v3:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage1-libstdc++-v3/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'  \
-	  clean
 
 
 .PHONY: all-stage2-target-libstdc++-v3 maybe-all-stage2-target-libstdc++-v3
 .PHONY: clean-stage2-target-libstdc++-v3 maybe-clean-stage2-target-libstdc++-v3
 maybe-all-stage2-target-libstdc++-v3:
 maybe-clean-stage2-target-libstdc++-v3:
-maybe-all-stage2-target-libstdc++-v3: all-stage2-target-libstdc++-v3
-all-stage2: all-stage2-target-libstdc++-v3
-TARGET-stage2-target-libstdc++-v3 = $(TARGET-target-libstdc++-v3)
-all-stage2-target-libstdc++-v3: configure-stage2-target-libstdc++-v3
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-target-libstdc++-v3)
-
-maybe-clean-stage2-target-libstdc++-v3: clean-stage2-target-libstdc++-v3
-clean-stage2: clean-stage2-target-libstdc++-v3
-clean-stage2-target-libstdc++-v3:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage2-libstdc++-v3/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   clean
 
 
 .PHONY: all-stage3-target-libstdc++-v3 maybe-all-stage3-target-libstdc++-v3
 .PHONY: clean-stage3-target-libstdc++-v3 maybe-clean-stage3-target-libstdc++-v3
 maybe-all-stage3-target-libstdc++-v3:
 maybe-clean-stage3-target-libstdc++-v3:
-maybe-all-stage3-target-libstdc++-v3: all-stage3-target-libstdc++-v3
-all-stage3: all-stage3-target-libstdc++-v3
-TARGET-stage3-target-libstdc++-v3 = $(TARGET-target-libstdc++-v3)
-all-stage3-target-libstdc++-v3: configure-stage3-target-libstdc++-v3
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-target-libstdc++-v3)
-
-maybe-clean-stage3-target-libstdc++-v3: clean-stage3-target-libstdc++-v3
-clean-stage3: clean-stage3-target-libstdc++-v3
-clean-stage3-target-libstdc++-v3:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage3-libstdc++-v3/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   clean
 
 
 .PHONY: all-stage4-target-libstdc++-v3 maybe-all-stage4-target-libstdc++-v3
 .PHONY: clean-stage4-target-libstdc++-v3 maybe-clean-stage4-target-libstdc++-v3
 maybe-all-stage4-target-libstdc++-v3:
 maybe-clean-stage4-target-libstdc++-v3:
-maybe-all-stage4-target-libstdc++-v3: all-stage4-target-libstdc++-v3
-all-stage4: all-stage4-target-libstdc++-v3
-TARGET-stage4-target-libstdc++-v3 = $(TARGET-target-libstdc++-v3)
-all-stage4-target-libstdc++-v3: configure-stage4-target-libstdc++-v3
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-target-libstdc++-v3)
-
-maybe-clean-stage4-target-libstdc++-v3: clean-stage4-target-libstdc++-v3
-clean-stage4: clean-stage4-target-libstdc++-v3
-clean-stage4-target-libstdc++-v3:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage4-libstdc++-v3/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   clean
 
 
 .PHONY: all-stageprofile-target-libstdc++-v3 maybe-all-stageprofile-target-libstdc++-v3
 .PHONY: clean-stageprofile-target-libstdc++-v3 maybe-clean-stageprofile-target-libstdc++-v3
 maybe-all-stageprofile-target-libstdc++-v3:
 maybe-clean-stageprofile-target-libstdc++-v3:
-maybe-all-stageprofile-target-libstdc++-v3: all-stageprofile-target-libstdc++-v3
-all-stageprofile: all-stageprofile-target-libstdc++-v3
-TARGET-stageprofile-target-libstdc++-v3 = $(TARGET-target-libstdc++-v3)
-all-stageprofile-target-libstdc++-v3: configure-stageprofile-target-libstdc++-v3
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-target-libstdc++-v3)
-
-maybe-clean-stageprofile-target-libstdc++-v3: clean-stageprofile-target-libstdc++-v3
-clean-stageprofile: clean-stageprofile-target-libstdc++-v3
-clean-stageprofile-target-libstdc++-v3:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stageprofile-libstdc++-v3/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   clean
 
 
 .PHONY: all-stagetrain-target-libstdc++-v3 maybe-all-stagetrain-target-libstdc++-v3
 .PHONY: clean-stagetrain-target-libstdc++-v3 maybe-clean-stagetrain-target-libstdc++-v3
 maybe-all-stagetrain-target-libstdc++-v3:
 maybe-clean-stagetrain-target-libstdc++-v3:
-maybe-all-stagetrain-target-libstdc++-v3: all-stagetrain-target-libstdc++-v3
-all-stagetrain: all-stagetrain-target-libstdc++-v3
-TARGET-stagetrain-target-libstdc++-v3 = $(TARGET-target-libstdc++-v3)
-all-stagetrain-target-libstdc++-v3: configure-stagetrain-target-libstdc++-v3
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-target-libstdc++-v3)
-
-maybe-clean-stagetrain-target-libstdc++-v3: clean-stagetrain-target-libstdc++-v3
-clean-stagetrain: clean-stagetrain-target-libstdc++-v3
-clean-stagetrain-target-libstdc++-v3:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stagetrain-libstdc++-v3/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   clean
 
 
 .PHONY: all-stagefeedback-target-libstdc++-v3 maybe-all-stagefeedback-target-libstdc++-v3
 .PHONY: clean-stagefeedback-target-libstdc++-v3 maybe-clean-stagefeedback-target-libstdc++-v3
 maybe-all-stagefeedback-target-libstdc++-v3:
 maybe-clean-stagefeedback-target-libstdc++-v3:
-maybe-all-stagefeedback-target-libstdc++-v3: all-stagefeedback-target-libstdc++-v3
-all-stagefeedback: all-stagefeedback-target-libstdc++-v3
-TARGET-stagefeedback-target-libstdc++-v3 = $(TARGET-target-libstdc++-v3)
-all-stagefeedback-target-libstdc++-v3: configure-stagefeedback-target-libstdc++-v3
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-target-libstdc++-v3)
-
-maybe-clean-stagefeedback-target-libstdc++-v3: clean-stagefeedback-target-libstdc++-v3
-clean-stagefeedback: clean-stagefeedback-target-libstdc++-v3
-clean-stagefeedback-target-libstdc++-v3:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stagefeedback-libstdc++-v3/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   clean
 
 
 .PHONY: all-stageautoprofile-target-libstdc++-v3 maybe-all-stageautoprofile-target-libstdc++-v3
 .PHONY: clean-stageautoprofile-target-libstdc++-v3 maybe-clean-stageautoprofile-target-libstdc++-v3
 maybe-all-stageautoprofile-target-libstdc++-v3:
 maybe-clean-stageautoprofile-target-libstdc++-v3:
-maybe-all-stageautoprofile-target-libstdc++-v3: all-stageautoprofile-target-libstdc++-v3
-all-stageautoprofile: all-stageautoprofile-target-libstdc++-v3
-TARGET-stageautoprofile-target-libstdc++-v3 = $(TARGET-target-libstdc++-v3)
-all-stageautoprofile-target-libstdc++-v3: configure-stageautoprofile-target-libstdc++-v3
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-target-libstdc++-v3)
-
-maybe-clean-stageautoprofile-target-libstdc++-v3: clean-stageautoprofile-target-libstdc++-v3
-clean-stageautoprofile: clean-stageautoprofile-target-libstdc++-v3
-clean-stageautoprofile-target-libstdc++-v3:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stageautoprofile-libstdc++-v3/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   clean
 
 
 .PHONY: all-stageautofeedback-target-libstdc++-v3 maybe-all-stageautofeedback-target-libstdc++-v3
 .PHONY: clean-stageautofeedback-target-libstdc++-v3 maybe-clean-stageautofeedback-target-libstdc++-v3
 maybe-all-stageautofeedback-target-libstdc++-v3:
 maybe-clean-stageautofeedback-target-libstdc++-v3:
-maybe-all-stageautofeedback-target-libstdc++-v3: all-stageautofeedback-target-libstdc++-v3
-all-stageautofeedback: all-stageautofeedback-target-libstdc++-v3
-TARGET-stageautofeedback-target-libstdc++-v3 = $(TARGET-target-libstdc++-v3)
-all-stageautofeedback-target-libstdc++-v3: configure-stageautofeedback-target-libstdc++-v3
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(RAW_CXX_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-target-libstdc++-v3)
-
-maybe-clean-stageautofeedback-target-libstdc++-v3: clean-stageautofeedback-target-libstdc++-v3
-clean-stageautofeedback: clean-stageautofeedback-target-libstdc++-v3
-clean-stageautofeedback-target-libstdc++-v3:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stageautofeedback-libstdc++-v3/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libstdc++-v3 && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS) 'CXX=$$(RAW_CXX_FOR_TARGET)' 'CXX_FOR_TARGET=$$(RAW_CXX_FOR_TARGET)'   clean
 
 
 
@@ -18424,7 +13025,6 @@ maintainer-clean-target-libstdc++-v3:
 
 .PHONY: configure-target-libsanitizer maybe-configure-target-libsanitizer
 maybe-configure-target-libsanitizer:
-configure-target-libsanitizer: stage_current
 maybe-configure-target-libsanitizer: configure-target-libsanitizer
 configure-target-libsanitizer: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -18496,7 +13096,6 @@ maybe-configure-stageautofeedback-target-libsanitizer:
 
 .PHONY: all-target-libsanitizer maybe-all-target-libsanitizer
 maybe-all-target-libsanitizer:
-all-target-libsanitizer: stage_current
 TARGET-target-libsanitizer=all
 maybe-all-target-libsanitizer: all-target-libsanitizer
 all-target-libsanitizer: configure-target-libsanitizer
@@ -18950,7 +13549,6 @@ maintainer-clean-target-libsanitizer:
 
 .PHONY: configure-target-libvtv maybe-configure-target-libvtv
 maybe-configure-target-libvtv:
-configure-target-libvtv: stage_current
 maybe-configure-target-libvtv: configure-target-libvtv
 configure-target-libvtv: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -19022,7 +13620,6 @@ maybe-configure-stageautofeedback-target-libvtv:
 
 .PHONY: all-target-libvtv maybe-all-target-libvtv
 maybe-all-target-libvtv:
-all-target-libvtv: stage_current
 TARGET-target-libvtv=all
 maybe-all-target-libvtv: all-target-libvtv
 all-target-libvtv: configure-target-libvtv
@@ -19476,7 +14073,6 @@ maintainer-clean-target-libvtv:
 
 .PHONY: configure-target-libssp maybe-configure-target-libssp
 maybe-configure-target-libssp:
-configure-target-libssp: stage_current
 maybe-configure-target-libssp: configure-target-libssp
 configure-target-libssp: 
 	@: $(MAKE); $(unstage)
@@ -19520,7 +14116,6 @@ configure-target-libssp:
 
 .PHONY: all-target-libssp maybe-all-target-libssp
 maybe-all-target-libssp:
-all-target-libssp: stage_current
 TARGET-target-libssp=all
 maybe-all-target-libssp: all-target-libssp
 all-target-libssp: configure-target-libssp
@@ -19919,7 +14514,6 @@ maintainer-clean-target-libssp:
 
 .PHONY: configure-target-newlib maybe-configure-target-newlib
 maybe-configure-target-newlib:
-configure-target-newlib: stage_current
 
 
 
@@ -19927,7 +14521,6 @@ configure-target-newlib: stage_current
 
 .PHONY: all-target-newlib maybe-all-target-newlib
 maybe-all-target-newlib:
-all-target-newlib: stage_current
 
 
 
@@ -19992,7 +14585,6 @@ maybe-maintainer-clean-target-newlib:
 
 .PHONY: configure-target-libgcc maybe-configure-target-libgcc
 maybe-configure-target-libgcc:
-configure-target-libgcc: stage_current
 maybe-configure-target-libgcc: configure-target-libgcc
 configure-target-libgcc: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -20033,389 +14625,30 @@ configure-target-libgcc:
 
 .PHONY: configure-stage1-target-libgcc maybe-configure-stage1-target-libgcc
 maybe-configure-stage1-target-libgcc:
-maybe-configure-stage1-target-libgcc: configure-stage1-target-libgcc
-configure-stage1-target-libgcc:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	echo "Checking multilib configuration for libgcc..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgcc/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgcc/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgcc/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgcc/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(TARGET_SUBDIR)/libgcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc; \
-	cd $(TARGET_SUBDIR)/libgcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage2-target-libgcc maybe-configure-stage2-target-libgcc
 maybe-configure-stage2-target-libgcc:
-maybe-configure-stage2-target-libgcc: configure-stage2-target-libgcc
-configure-stage2-target-libgcc:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	echo "Checking multilib configuration for libgcc..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgcc/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgcc/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgcc/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgcc/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(TARGET_SUBDIR)/libgcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc; \
-	cd $(TARGET_SUBDIR)/libgcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage3-target-libgcc maybe-configure-stage3-target-libgcc
 maybe-configure-stage3-target-libgcc:
-maybe-configure-stage3-target-libgcc: configure-stage3-target-libgcc
-configure-stage3-target-libgcc:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	echo "Checking multilib configuration for libgcc..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgcc/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgcc/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgcc/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgcc/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(TARGET_SUBDIR)/libgcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc; \
-	cd $(TARGET_SUBDIR)/libgcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage4-target-libgcc maybe-configure-stage4-target-libgcc
 maybe-configure-stage4-target-libgcc:
-maybe-configure-stage4-target-libgcc: configure-stage4-target-libgcc
-configure-stage4-target-libgcc:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	echo "Checking multilib configuration for libgcc..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgcc/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgcc/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgcc/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgcc/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(TARGET_SUBDIR)/libgcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc; \
-	cd $(TARGET_SUBDIR)/libgcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageprofile-target-libgcc maybe-configure-stageprofile-target-libgcc
 maybe-configure-stageprofile-target-libgcc:
-maybe-configure-stageprofile-target-libgcc: configure-stageprofile-target-libgcc
-configure-stageprofile-target-libgcc:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	echo "Checking multilib configuration for libgcc..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgcc/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgcc/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgcc/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgcc/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(TARGET_SUBDIR)/libgcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc; \
-	cd $(TARGET_SUBDIR)/libgcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagetrain-target-libgcc maybe-configure-stagetrain-target-libgcc
 maybe-configure-stagetrain-target-libgcc:
-maybe-configure-stagetrain-target-libgcc: configure-stagetrain-target-libgcc
-configure-stagetrain-target-libgcc:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	echo "Checking multilib configuration for libgcc..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgcc/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgcc/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgcc/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgcc/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(TARGET_SUBDIR)/libgcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc; \
-	cd $(TARGET_SUBDIR)/libgcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagefeedback-target-libgcc maybe-configure-stagefeedback-target-libgcc
 maybe-configure-stagefeedback-target-libgcc:
-maybe-configure-stagefeedback-target-libgcc: configure-stagefeedback-target-libgcc
-configure-stagefeedback-target-libgcc:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	echo "Checking multilib configuration for libgcc..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgcc/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgcc/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgcc/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgcc/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(TARGET_SUBDIR)/libgcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc; \
-	cd $(TARGET_SUBDIR)/libgcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautoprofile-target-libgcc maybe-configure-stageautoprofile-target-libgcc
 maybe-configure-stageautoprofile-target-libgcc:
-maybe-configure-stageautoprofile-target-libgcc: configure-stageautoprofile-target-libgcc
-configure-stageautoprofile-target-libgcc:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	echo "Checking multilib configuration for libgcc..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgcc/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgcc/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgcc/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgcc/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(TARGET_SUBDIR)/libgcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc; \
-	cd $(TARGET_SUBDIR)/libgcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautofeedback-target-libgcc maybe-configure-stageautofeedback-target-libgcc
 maybe-configure-stageautofeedback-target-libgcc:
-maybe-configure-stageautofeedback-target-libgcc: configure-stageautofeedback-target-libgcc
-configure-stageautofeedback-target-libgcc:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	echo "Checking multilib configuration for libgcc..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgcc/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgcc/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgcc/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgcc/multilib.tmp $(TARGET_SUBDIR)/libgcc/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgcc/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(TARGET_SUBDIR)/libgcc; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgcc; \
-	cd $(TARGET_SUBDIR)/libgcc || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgcc/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgcc; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS)
 
 
 
@@ -20423,7 +14656,6 @@ configure-stageautofeedback-target-libgcc:
 
 .PHONY: all-target-libgcc maybe-all-target-libgcc
 maybe-all-target-libgcc:
-all-target-libgcc: stage_current
 TARGET-target-libgcc=all
 maybe-all-target-libgcc: all-target-libgcc
 all-target-libgcc: configure-target-libgcc
@@ -20440,361 +14672,54 @@ all-target-libgcc: configure-target-libgcc
 .PHONY: clean-stage1-target-libgcc maybe-clean-stage1-target-libgcc
 maybe-all-stage1-target-libgcc:
 maybe-clean-stage1-target-libgcc:
-maybe-all-stage1-target-libgcc: all-stage1-target-libgcc
-all-stage1: all-stage1-target-libgcc
-TARGET-stage1-target-libgcc = $(TARGET-target-libgcc)
-all-stage1-target-libgcc: configure-stage1-target-libgcc
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS)  \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)  \
-		  \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-target-libgcc)
-
-maybe-clean-stage1-target-libgcc: clean-stage1-target-libgcc
-clean-stage1: clean-stage1-target-libgcc
-clean-stage1-target-libgcc:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage1-libgcc/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)  \
-	  clean
 
 
 .PHONY: all-stage2-target-libgcc maybe-all-stage2-target-libgcc
 .PHONY: clean-stage2-target-libgcc maybe-clean-stage2-target-libgcc
 maybe-all-stage2-target-libgcc:
 maybe-clean-stage2-target-libgcc:
-maybe-all-stage2-target-libgcc: all-stage2-target-libgcc
-all-stage2: all-stage2-target-libgcc
-TARGET-stage2-target-libgcc = $(TARGET-target-libgcc)
-all-stage2-target-libgcc: configure-stage2-target-libgcc
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-target-libgcc)
-
-maybe-clean-stage2-target-libgcc: clean-stage2-target-libgcc
-clean-stage2: clean-stage2-target-libgcc
-clean-stage2-target-libgcc:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage2-libgcc/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stage3-target-libgcc maybe-all-stage3-target-libgcc
 .PHONY: clean-stage3-target-libgcc maybe-clean-stage3-target-libgcc
 maybe-all-stage3-target-libgcc:
 maybe-clean-stage3-target-libgcc:
-maybe-all-stage3-target-libgcc: all-stage3-target-libgcc
-all-stage3: all-stage3-target-libgcc
-TARGET-stage3-target-libgcc = $(TARGET-target-libgcc)
-all-stage3-target-libgcc: configure-stage3-target-libgcc
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-target-libgcc)
-
-maybe-clean-stage3-target-libgcc: clean-stage3-target-libgcc
-clean-stage3: clean-stage3-target-libgcc
-clean-stage3-target-libgcc:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage3-libgcc/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stage4-target-libgcc maybe-all-stage4-target-libgcc
 .PHONY: clean-stage4-target-libgcc maybe-clean-stage4-target-libgcc
 maybe-all-stage4-target-libgcc:
 maybe-clean-stage4-target-libgcc:
-maybe-all-stage4-target-libgcc: all-stage4-target-libgcc
-all-stage4: all-stage4-target-libgcc
-TARGET-stage4-target-libgcc = $(TARGET-target-libgcc)
-all-stage4-target-libgcc: configure-stage4-target-libgcc
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-target-libgcc)
-
-maybe-clean-stage4-target-libgcc: clean-stage4-target-libgcc
-clean-stage4: clean-stage4-target-libgcc
-clean-stage4-target-libgcc:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage4-libgcc/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stageprofile-target-libgcc maybe-all-stageprofile-target-libgcc
 .PHONY: clean-stageprofile-target-libgcc maybe-clean-stageprofile-target-libgcc
 maybe-all-stageprofile-target-libgcc:
 maybe-clean-stageprofile-target-libgcc:
-maybe-all-stageprofile-target-libgcc: all-stageprofile-target-libgcc
-all-stageprofile: all-stageprofile-target-libgcc
-TARGET-stageprofile-target-libgcc = $(TARGET-target-libgcc)
-all-stageprofile-target-libgcc: configure-stageprofile-target-libgcc
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-target-libgcc)
-
-maybe-clean-stageprofile-target-libgcc: clean-stageprofile-target-libgcc
-clean-stageprofile: clean-stageprofile-target-libgcc
-clean-stageprofile-target-libgcc:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stageprofile-libgcc/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stagetrain-target-libgcc maybe-all-stagetrain-target-libgcc
 .PHONY: clean-stagetrain-target-libgcc maybe-clean-stagetrain-target-libgcc
 maybe-all-stagetrain-target-libgcc:
 maybe-clean-stagetrain-target-libgcc:
-maybe-all-stagetrain-target-libgcc: all-stagetrain-target-libgcc
-all-stagetrain: all-stagetrain-target-libgcc
-TARGET-stagetrain-target-libgcc = $(TARGET-target-libgcc)
-all-stagetrain-target-libgcc: configure-stagetrain-target-libgcc
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-target-libgcc)
-
-maybe-clean-stagetrain-target-libgcc: clean-stagetrain-target-libgcc
-clean-stagetrain: clean-stagetrain-target-libgcc
-clean-stagetrain-target-libgcc:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stagetrain-libgcc/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stagefeedback-target-libgcc maybe-all-stagefeedback-target-libgcc
 .PHONY: clean-stagefeedback-target-libgcc maybe-clean-stagefeedback-target-libgcc
 maybe-all-stagefeedback-target-libgcc:
 maybe-clean-stagefeedback-target-libgcc:
-maybe-all-stagefeedback-target-libgcc: all-stagefeedback-target-libgcc
-all-stagefeedback: all-stagefeedback-target-libgcc
-TARGET-stagefeedback-target-libgcc = $(TARGET-target-libgcc)
-all-stagefeedback-target-libgcc: configure-stagefeedback-target-libgcc
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-target-libgcc)
-
-maybe-clean-stagefeedback-target-libgcc: clean-stagefeedback-target-libgcc
-clean-stagefeedback: clean-stagefeedback-target-libgcc
-clean-stagefeedback-target-libgcc:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stagefeedback-libgcc/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stageautoprofile-target-libgcc maybe-all-stageautoprofile-target-libgcc
 .PHONY: clean-stageautoprofile-target-libgcc maybe-clean-stageautoprofile-target-libgcc
 maybe-all-stageautoprofile-target-libgcc:
 maybe-clean-stageautoprofile-target-libgcc:
-maybe-all-stageautoprofile-target-libgcc: all-stageautoprofile-target-libgcc
-all-stageautoprofile: all-stageautoprofile-target-libgcc
-TARGET-stageautoprofile-target-libgcc = $(TARGET-target-libgcc)
-all-stageautoprofile-target-libgcc: configure-stageautoprofile-target-libgcc
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-target-libgcc)
-
-maybe-clean-stageautoprofile-target-libgcc: clean-stageautoprofile-target-libgcc
-clean-stageautoprofile: clean-stageautoprofile-target-libgcc
-clean-stageautoprofile-target-libgcc:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stageautoprofile-libgcc/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stageautofeedback-target-libgcc maybe-all-stageautofeedback-target-libgcc
 .PHONY: clean-stageautofeedback-target-libgcc maybe-clean-stageautofeedback-target-libgcc
 maybe-all-stageautofeedback-target-libgcc:
 maybe-clean-stageautofeedback-target-libgcc:
-maybe-all-stageautofeedback-target-libgcc: all-stageautofeedback-target-libgcc
-all-stageautofeedback: all-stageautofeedback-target-libgcc
-TARGET-stageautofeedback-target-libgcc = $(TARGET-target-libgcc)
-all-stageautofeedback-target-libgcc: configure-stageautofeedback-target-libgcc
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-target-libgcc)
-
-maybe-clean-stageautofeedback-target-libgcc: clean-stageautofeedback-target-libgcc
-clean-stageautofeedback: clean-stageautofeedback-target-libgcc
-clean-stageautofeedback-target-libgcc:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgcc/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stageautofeedback-libgcc/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgcc && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 
@@ -21146,7 +15071,6 @@ maintainer-clean-target-libgcc:
 
 .PHONY: configure-target-libbacktrace maybe-configure-target-libbacktrace
 maybe-configure-target-libbacktrace:
-configure-target-libbacktrace: stage_current
 
 
 
@@ -21183,7 +15107,6 @@ maybe-configure-stageautofeedback-target-libbacktrace:
 
 .PHONY: all-target-libbacktrace maybe-all-target-libbacktrace
 maybe-all-target-libbacktrace:
-all-target-libbacktrace: stage_current
 
 
 
@@ -21304,7 +15227,6 @@ maybe-maintainer-clean-target-libbacktrace:
 
 .PHONY: configure-target-libquadmath maybe-configure-target-libquadmath
 maybe-configure-target-libquadmath:
-configure-target-libquadmath: stage_current
 maybe-configure-target-libquadmath: configure-target-libquadmath
 configure-target-libquadmath: 
 	@: $(MAKE); $(unstage)
@@ -21348,7 +15270,6 @@ configure-target-libquadmath:
 
 .PHONY: all-target-libquadmath maybe-all-target-libquadmath
 maybe-all-target-libquadmath:
-all-target-libquadmath: stage_current
 TARGET-target-libquadmath=all
 maybe-all-target-libquadmath: all-target-libquadmath
 all-target-libquadmath: configure-target-libquadmath
@@ -21747,7 +15668,6 @@ maintainer-clean-target-libquadmath:
 
 .PHONY: configure-target-libgfortran maybe-configure-target-libgfortran
 maybe-configure-target-libgfortran:
-configure-target-libgfortran: stage_current
 
 
 
@@ -21755,7 +15675,6 @@ configure-target-libgfortran: stage_current
 
 .PHONY: all-target-libgfortran maybe-all-target-libgfortran
 maybe-all-target-libgfortran:
-all-target-libgfortran: stage_current
 
 
 
@@ -21820,7 +15739,6 @@ maybe-maintainer-clean-target-libgfortran:
 
 .PHONY: configure-target-libobjc maybe-configure-target-libobjc
 maybe-configure-target-libobjc:
-configure-target-libobjc: stage_current
 
 
 
@@ -21828,7 +15746,6 @@ configure-target-libobjc: stage_current
 
 .PHONY: all-target-libobjc maybe-all-target-libobjc
 maybe-all-target-libobjc:
-all-target-libobjc: stage_current
 
 
 
@@ -21893,7 +15810,6 @@ maybe-maintainer-clean-target-libobjc:
 
 .PHONY: configure-target-libgo maybe-configure-target-libgo
 maybe-configure-target-libgo:
-configure-target-libgo: stage_current
 
 
 
@@ -21901,7 +15817,6 @@ configure-target-libgo: stage_current
 
 .PHONY: all-target-libgo maybe-all-target-libgo
 maybe-all-target-libgo:
-all-target-libgo: stage_current
 
 
 
@@ -21966,7 +15881,6 @@ maybe-maintainer-clean-target-libgo:
 
 .PHONY: configure-target-libphobos maybe-configure-target-libphobos
 maybe-configure-target-libphobos:
-configure-target-libphobos: stage_current
 
 
 
@@ -22003,7 +15917,6 @@ maybe-configure-stageautofeedback-target-libphobos:
 
 .PHONY: all-target-libphobos maybe-all-target-libphobos
 maybe-all-target-libphobos:
-all-target-libphobos: stage_current
 
 
 
@@ -22124,7 +16037,6 @@ maybe-maintainer-clean-target-libphobos:
 
 .PHONY: configure-target-libtermcap maybe-configure-target-libtermcap
 maybe-configure-target-libtermcap:
-configure-target-libtermcap: stage_current
 
 
 
@@ -22132,7 +16044,6 @@ configure-target-libtermcap: stage_current
 
 .PHONY: all-target-libtermcap maybe-all-target-libtermcap
 maybe-all-target-libtermcap:
-all-target-libtermcap: stage_current
 
 
 
@@ -22197,7 +16108,6 @@ maybe-maintainer-clean-target-libtermcap:
 
 .PHONY: configure-target-winsup maybe-configure-target-winsup
 maybe-configure-target-winsup:
-configure-target-winsup: stage_current
 
 
 
@@ -22205,7 +16115,6 @@ configure-target-winsup: stage_current
 
 .PHONY: all-target-winsup maybe-all-target-winsup
 maybe-all-target-winsup:
-all-target-winsup: stage_current
 
 
 
@@ -22270,7 +16179,6 @@ maybe-maintainer-clean-target-winsup:
 
 .PHONY: configure-target-libgloss maybe-configure-target-libgloss
 maybe-configure-target-libgloss:
-configure-target-libgloss: stage_current
 
 
 
@@ -22278,7 +16186,6 @@ configure-target-libgloss: stage_current
 
 .PHONY: all-target-libgloss maybe-all-target-libgloss
 maybe-all-target-libgloss:
-all-target-libgloss: stage_current
 
 
 
@@ -22343,7 +16250,6 @@ maybe-maintainer-clean-target-libgloss:
 
 .PHONY: configure-target-libffi maybe-configure-target-libffi
 maybe-configure-target-libffi:
-configure-target-libffi: stage_current
 
 
 
@@ -22351,7 +16257,6 @@ configure-target-libffi: stage_current
 
 .PHONY: all-target-libffi maybe-all-target-libffi
 maybe-all-target-libffi:
-all-target-libffi: stage_current
 
 
 
@@ -22416,7 +16321,6 @@ maybe-maintainer-clean-target-libffi:
 
 .PHONY: configure-target-zlib maybe-configure-target-zlib
 maybe-configure-target-zlib:
-configure-target-zlib: stage_current
 
 
 
@@ -22453,7 +16357,6 @@ maybe-configure-stageautofeedback-target-zlib:
 
 .PHONY: all-target-zlib maybe-all-target-zlib
 maybe-all-target-zlib:
-all-target-zlib: stage_current
 
 
 
@@ -22574,7 +16477,6 @@ maybe-maintainer-clean-target-zlib:
 
 .PHONY: configure-target-rda maybe-configure-target-rda
 maybe-configure-target-rda:
-configure-target-rda: stage_current
 
 
 
@@ -22582,7 +16484,6 @@ configure-target-rda: stage_current
 
 .PHONY: all-target-rda maybe-all-target-rda
 maybe-all-target-rda:
-all-target-rda: stage_current
 
 
 
@@ -22647,7 +16548,6 @@ maybe-maintainer-clean-target-rda:
 
 .PHONY: configure-target-libada maybe-configure-target-libada
 maybe-configure-target-libada:
-configure-target-libada: stage_current
 
 
 
@@ -22655,7 +16555,6 @@ configure-target-libada: stage_current
 
 .PHONY: all-target-libada maybe-all-target-libada
 maybe-all-target-libada:
-all-target-libada: stage_current
 
 
 
@@ -22720,7 +16619,6 @@ maybe-maintainer-clean-target-libada:
 
 .PHONY: configure-target-libgm2 maybe-configure-target-libgm2
 maybe-configure-target-libgm2:
-configure-target-libgm2: stage_current
 
 
 
@@ -22728,7 +16626,6 @@ configure-target-libgm2: stage_current
 
 .PHONY: all-target-libgm2 maybe-all-target-libgm2
 maybe-all-target-libgm2:
-all-target-libgm2: stage_current
 
 
 
@@ -22793,7 +16690,6 @@ maybe-maintainer-clean-target-libgm2:
 
 .PHONY: configure-target-libgomp maybe-configure-target-libgomp
 maybe-configure-target-libgomp:
-configure-target-libgomp: stage_current
 maybe-configure-target-libgomp: configure-target-libgomp
 configure-target-libgomp: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -22834,389 +16730,30 @@ configure-target-libgomp:
 
 .PHONY: configure-stage1-target-libgomp maybe-configure-stage1-target-libgomp
 maybe-configure-stage1-target-libgomp:
-maybe-configure-stage1-target-libgomp: configure-stage1-target-libgomp
-configure-stage1-target-libgomp:
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	echo "Checking multilib configuration for libgomp..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgomp/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgomp/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgomp/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgomp/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 1 in $(TARGET_SUBDIR)/libgomp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp; \
-	cd $(TARGET_SUBDIR)/libgomp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgomp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgomp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	   \
-	  $(STAGE1_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage2-target-libgomp maybe-configure-stage2-target-libgomp
 maybe-configure-stage2-target-libgomp:
-maybe-configure-stage2-target-libgomp: configure-stage2-target-libgomp
-configure-stage2-target-libgomp:
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	echo "Checking multilib configuration for libgomp..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgomp/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgomp/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgomp/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgomp/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 2 in $(TARGET_SUBDIR)/libgomp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp; \
-	cd $(TARGET_SUBDIR)/libgomp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgomp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgomp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage3-target-libgomp maybe-configure-stage3-target-libgomp
 maybe-configure-stage3-target-libgomp:
-maybe-configure-stage3-target-libgomp: configure-stage3-target-libgomp
-configure-stage3-target-libgomp:
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	echo "Checking multilib configuration for libgomp..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgomp/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgomp/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgomp/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgomp/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 3 in $(TARGET_SUBDIR)/libgomp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp; \
-	cd $(TARGET_SUBDIR)/libgomp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgomp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgomp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS)
 
 .PHONY: configure-stage4-target-libgomp maybe-configure-stage4-target-libgomp
 maybe-configure-stage4-target-libgomp:
-maybe-configure-stage4-target-libgomp: configure-stage4-target-libgomp
-configure-stage4-target-libgomp:
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	echo "Checking multilib configuration for libgomp..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgomp/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgomp/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgomp/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgomp/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage 4 in $(TARGET_SUBDIR)/libgomp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp; \
-	cd $(TARGET_SUBDIR)/libgomp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgomp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgomp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageprofile-target-libgomp maybe-configure-stageprofile-target-libgomp
 maybe-configure-stageprofile-target-libgomp:
-maybe-configure-stageprofile-target-libgomp: configure-stageprofile-target-libgomp
-configure-stageprofile-target-libgomp:
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	echo "Checking multilib configuration for libgomp..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgomp/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgomp/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgomp/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgomp/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage profile in $(TARGET_SUBDIR)/libgomp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp; \
-	cd $(TARGET_SUBDIR)/libgomp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgomp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgomp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagetrain-target-libgomp maybe-configure-stagetrain-target-libgomp
 maybe-configure-stagetrain-target-libgomp:
-maybe-configure-stagetrain-target-libgomp: configure-stagetrain-target-libgomp
-configure-stagetrain-target-libgomp:
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	echo "Checking multilib configuration for libgomp..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgomp/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgomp/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgomp/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgomp/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage train in $(TARGET_SUBDIR)/libgomp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp; \
-	cd $(TARGET_SUBDIR)/libgomp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgomp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgomp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS)
 
 .PHONY: configure-stagefeedback-target-libgomp maybe-configure-stagefeedback-target-libgomp
 maybe-configure-stagefeedback-target-libgomp:
-maybe-configure-stagefeedback-target-libgomp: configure-stagefeedback-target-libgomp
-configure-stagefeedback-target-libgomp:
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	echo "Checking multilib configuration for libgomp..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgomp/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgomp/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgomp/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgomp/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage feedback in $(TARGET_SUBDIR)/libgomp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp; \
-	cd $(TARGET_SUBDIR)/libgomp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgomp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgomp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautoprofile-target-libgomp maybe-configure-stageautoprofile-target-libgomp
 maybe-configure-stageautoprofile-target-libgomp:
-maybe-configure-stageautoprofile-target-libgomp: configure-stageautoprofile-target-libgomp
-configure-stageautoprofile-target-libgomp:
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	echo "Checking multilib configuration for libgomp..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgomp/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgomp/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgomp/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgomp/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage autoprofile in $(TARGET_SUBDIR)/libgomp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp; \
-	cd $(TARGET_SUBDIR)/libgomp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgomp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgomp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS)
 
 .PHONY: configure-stageautofeedback-target-libgomp maybe-configure-stageautofeedback-target-libgomp
 maybe-configure-stageautofeedback-target-libgomp:
-maybe-configure-stageautofeedback-target-libgomp: configure-stageautofeedback-target-libgomp
-configure-stageautofeedback-target-libgomp:
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	echo "Checking multilib configuration for libgomp..."; \
-	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgomp/multilib.tmp 2> /dev/null; \
-	if test -r $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	  if cmp -s $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; then \
-	    rm -f $(TARGET_SUBDIR)/libgomp/multilib.tmp; \
-	  else \
-	    rm -f $(TARGET_SUBDIR)/libgomp/Makefile; \
-	    mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	  fi; \
-	else \
-	  mv $(TARGET_SUBDIR)/libgomp/multilib.tmp $(TARGET_SUBDIR)/libgomp/multilib.out; \
-	fi; \
-	test ! -f $(TARGET_SUBDIR)/libgomp/Makefile || exit 0; \
-	$(NORMAL_TARGET_EXPORTS) \
-	 \
-	CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
-	CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
-	LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)"; export LIBCFLAGS;  \
-	echo Configuring stage autofeedback in $(TARGET_SUBDIR)/libgomp; \
-	$(SHELL) $(srcdir)/mkinstalldirs $(TARGET_SUBDIR)/libgomp; \
-	cd $(TARGET_SUBDIR)/libgomp || exit 1; \
-	case $(srcdir) in \
-	  /* | [A-Za-z]:[\\/]*) topdir=$(srcdir) ;; \
-	  *) topdir=`echo $(TARGET_SUBDIR)/libgomp/ | \
-		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
-	esac; \
-	module_srcdir=libgomp; \
-	$(SHELL) $$s/$$module_srcdir/configure \
-	  --srcdir=$${topdir}/$$module_srcdir \
-	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias} \
-	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS)
 
 
 
@@ -23224,7 +16761,6 @@ configure-stageautofeedback-target-libgomp:
 
 .PHONY: all-target-libgomp maybe-all-target-libgomp
 maybe-all-target-libgomp:
-all-target-libgomp: stage_current
 TARGET-target-libgomp=all
 maybe-all-target-libgomp: all-target-libgomp
 all-target-libgomp: configure-target-libgomp
@@ -23241,361 +16777,54 @@ all-target-libgomp: configure-target-libgomp
 .PHONY: clean-stage1-target-libgomp maybe-clean-stage1-target-libgomp
 maybe-all-stage1-target-libgomp:
 maybe-clean-stage1-target-libgomp:
-maybe-all-stage1-target-libgomp: all-stage1-target-libgomp
-all-stage1: all-stage1-target-libgomp
-TARGET-stage1-target-libgomp = $(TARGET-target-libgomp)
-all-stage1-target-libgomp: configure-stage1-target-libgomp
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE1_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS)  \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)  \
-		  \
-		TFLAGS="$(STAGE1_TFLAGS)"  \
-		$(TARGET-stage1-target-libgomp)
-
-maybe-clean-stage1-target-libgomp: clean-stage1-target-libgomp
-clean-stage1: clean-stage1-target-libgomp
-clean-stage1-target-libgomp:
-	@if [ $(current_stage) = stage1 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgomp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage1-libgomp/Makefile ] || exit 0; \
-	  $(MAKE) stage1-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)  \
-	  clean
 
 
 .PHONY: all-stage2-target-libgomp maybe-all-stage2-target-libgomp
 .PHONY: clean-stage2-target-libgomp maybe-clean-stage2-target-libgomp
 maybe-all-stage2-target-libgomp:
 maybe-clean-stage2-target-libgomp:
-maybe-all-stage2-target-libgomp: all-stage2-target-libgomp
-all-stage2: all-stage2-target-libgomp
-TARGET-stage2-target-libgomp = $(TARGET-target-libgomp)
-all-stage2-target-libgomp: configure-stage2-target-libgomp
-	@[ $(current_stage) = stage2 ] || $(MAKE) stage2-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGE2_TFLAGS)"  \
-		$(TARGET-stage2-target-libgomp)
-
-maybe-clean-stage2-target-libgomp: clean-stage2-target-libgomp
-clean-stage2: clean-stage2-target-libgomp
-clean-stage2-target-libgomp:
-	@if [ $(current_stage) = stage2 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgomp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage2-libgomp/Makefile ] || exit 0; \
-	  $(MAKE) stage2-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stage3-target-libgomp maybe-all-stage3-target-libgomp
 .PHONY: clean-stage3-target-libgomp maybe-clean-stage3-target-libgomp
 maybe-all-stage3-target-libgomp:
 maybe-clean-stage3-target-libgomp:
-maybe-all-stage3-target-libgomp: all-stage3-target-libgomp
-all-stage3: all-stage3-target-libgomp
-TARGET-stage3-target-libgomp = $(TARGET-target-libgomp)
-all-stage3-target-libgomp: configure-stage3-target-libgomp
-	@[ $(current_stage) = stage3 ] || $(MAKE) stage3-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGE3_TFLAGS)"  \
-		$(TARGET-stage3-target-libgomp)
-
-maybe-clean-stage3-target-libgomp: clean-stage3-target-libgomp
-clean-stage3: clean-stage3-target-libgomp
-clean-stage3-target-libgomp:
-	@if [ $(current_stage) = stage3 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgomp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage3-libgomp/Makefile ] || exit 0; \
-	  $(MAKE) stage3-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stage4-target-libgomp maybe-all-stage4-target-libgomp
 .PHONY: clean-stage4-target-libgomp maybe-clean-stage4-target-libgomp
 maybe-all-stage4-target-libgomp:
 maybe-clean-stage4-target-libgomp:
-maybe-all-stage4-target-libgomp: all-stage4-target-libgomp
-all-stage4: all-stage4-target-libgomp
-TARGET-stage4-target-libgomp = $(TARGET-target-libgomp)
-all-stage4-target-libgomp: configure-stage4-target-libgomp
-	@[ $(current_stage) = stage4 ] || $(MAKE) stage4-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGE4_TFLAGS)"  \
-		$(TARGET-stage4-target-libgomp)
-
-maybe-clean-stage4-target-libgomp: clean-stage4-target-libgomp
-clean-stage4: clean-stage4-target-libgomp
-clean-stage4-target-libgomp:
-	@if [ $(current_stage) = stage4 ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgomp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stage4-libgomp/Makefile ] || exit 0; \
-	  $(MAKE) stage4-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stageprofile-target-libgomp maybe-all-stageprofile-target-libgomp
 .PHONY: clean-stageprofile-target-libgomp maybe-clean-stageprofile-target-libgomp
 maybe-all-stageprofile-target-libgomp:
 maybe-clean-stageprofile-target-libgomp:
-maybe-all-stageprofile-target-libgomp: all-stageprofile-target-libgomp
-all-stageprofile: all-stageprofile-target-libgomp
-TARGET-stageprofile-target-libgomp = $(TARGET-target-libgomp)
-all-stageprofile-target-libgomp: configure-stageprofile-target-libgomp
-	@[ $(current_stage) = stageprofile ] || $(MAKE) stageprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEprofile_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGEprofile_TFLAGS)"  \
-		$(TARGET-stageprofile-target-libgomp)
-
-maybe-clean-stageprofile-target-libgomp: clean-stageprofile-target-libgomp
-clean-stageprofile: clean-stageprofile-target-libgomp
-clean-stageprofile-target-libgomp:
-	@if [ $(current_stage) = stageprofile ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgomp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stageprofile-libgomp/Makefile ] || exit 0; \
-	  $(MAKE) stageprofile-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stagetrain-target-libgomp maybe-all-stagetrain-target-libgomp
 .PHONY: clean-stagetrain-target-libgomp maybe-clean-stagetrain-target-libgomp
 maybe-all-stagetrain-target-libgomp:
 maybe-clean-stagetrain-target-libgomp:
-maybe-all-stagetrain-target-libgomp: all-stagetrain-target-libgomp
-all-stagetrain: all-stagetrain-target-libgomp
-TARGET-stagetrain-target-libgomp = $(TARGET-target-libgomp)
-all-stagetrain-target-libgomp: configure-stagetrain-target-libgomp
-	@[ $(current_stage) = stagetrain ] || $(MAKE) stagetrain-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEtrain_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGEtrain_TFLAGS)"  \
-		$(TARGET-stagetrain-target-libgomp)
-
-maybe-clean-stagetrain-target-libgomp: clean-stagetrain-target-libgomp
-clean-stagetrain: clean-stagetrain-target-libgomp
-clean-stagetrain-target-libgomp:
-	@if [ $(current_stage) = stagetrain ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgomp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stagetrain-libgomp/Makefile ] || exit 0; \
-	  $(MAKE) stagetrain-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stagefeedback-target-libgomp maybe-all-stagefeedback-target-libgomp
 .PHONY: clean-stagefeedback-target-libgomp maybe-clean-stagefeedback-target-libgomp
 maybe-all-stagefeedback-target-libgomp:
 maybe-clean-stagefeedback-target-libgomp:
-maybe-all-stagefeedback-target-libgomp: all-stagefeedback-target-libgomp
-all-stagefeedback: all-stagefeedback-target-libgomp
-TARGET-stagefeedback-target-libgomp = $(TARGET-target-libgomp)
-all-stagefeedback-target-libgomp: configure-stagefeedback-target-libgomp
-	@[ $(current_stage) = stagefeedback ] || $(MAKE) stagefeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGEfeedback_TFLAGS)"  \
-		$(TARGET-stagefeedback-target-libgomp)
-
-maybe-clean-stagefeedback-target-libgomp: clean-stagefeedback-target-libgomp
-clean-stagefeedback: clean-stagefeedback-target-libgomp
-clean-stagefeedback-target-libgomp:
-	@if [ $(current_stage) = stagefeedback ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgomp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stagefeedback-libgomp/Makefile ] || exit 0; \
-	  $(MAKE) stagefeedback-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stageautoprofile-target-libgomp maybe-all-stageautoprofile-target-libgomp
 .PHONY: clean-stageautoprofile-target-libgomp maybe-clean-stageautoprofile-target-libgomp
 maybe-all-stageautoprofile-target-libgomp:
 maybe-clean-stageautoprofile-target-libgomp:
-maybe-all-stageautoprofile-target-libgomp: all-stageautoprofile-target-libgomp
-all-stageautoprofile: all-stageautoprofile-target-libgomp
-TARGET-stageautoprofile-target-libgomp = $(TARGET-target-libgomp)
-all-stageautoprofile-target-libgomp: configure-stageautoprofile-target-libgomp
-	@[ $(current_stage) = stageautoprofile ] || $(MAKE) stageautoprofile-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautoprofile_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	$$s/gcc/config/i386/$(AUTO_PROFILE) \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGEautoprofile_TFLAGS)"  \
-		$(TARGET-stageautoprofile-target-libgomp)
-
-maybe-clean-stageautoprofile-target-libgomp: clean-stageautoprofile-target-libgomp
-clean-stageautoprofile: clean-stageautoprofile-target-libgomp
-clean-stageautoprofile-target-libgomp:
-	@if [ $(current_stage) = stageautoprofile ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgomp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stageautoprofile-libgomp/Makefile ] || exit 0; \
-	  $(MAKE) stageautoprofile-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 .PHONY: all-stageautofeedback-target-libgomp maybe-all-stageautofeedback-target-libgomp
 .PHONY: clean-stageautofeedback-target-libgomp maybe-clean-stageautofeedback-target-libgomp
 maybe-all-stageautofeedback-target-libgomp:
 maybe-clean-stageautofeedback-target-libgomp:
-maybe-all-stageautofeedback-target-libgomp: all-stageautofeedback-target-libgomp
-all-stageautofeedback: all-stageautofeedback-target-libgomp
-TARGET-stageautofeedback-target-libgomp = $(TARGET-target-libgomp)
-all-stageautofeedback-target-libgomp: configure-stageautofeedback-target-libgomp
-	@[ $(current_stage) = stageautofeedback ] || $(MAKE) stageautofeedback-start
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(NORMAL_TARGET_EXPORTS) \
-	  \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	 \
-	$(MAKE) $(BASE_FLAGS_TO_PASS) \
-		CFLAGS="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS="$(LIBCFLAGS_FOR_TARGET)" \
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" \
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" \
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" \
-		$(EXTRA_TARGET_FLAGS)   \
-		TFLAGS="$(STAGEautofeedback_TFLAGS)" PERF_DATA=perf.data \
-		$(TARGET-stageautofeedback-target-libgomp)
-
-maybe-clean-stageautofeedback-target-libgomp: clean-stageautofeedback-target-libgomp
-clean-stageautofeedback: clean-stageautofeedback-target-libgomp
-clean-stageautofeedback-target-libgomp:
-	@if [ $(current_stage) = stageautofeedback ]; then \
-	  [ -f $(TARGET_SUBDIR)/libgomp/Makefile ] || exit 0; \
-	else \
-	  [ -f $(TARGET_SUBDIR)/stageautofeedback-libgomp/Makefile ] || exit 0; \
-	  $(MAKE) stageautofeedback-start; \
-	fi; \
-	cd $(TARGET_SUBDIR)/libgomp && \
-	$(MAKE) $(EXTRA_TARGET_FLAGS)   clean
 
 
 
@@ -23985,7 +17214,6 @@ maintainer-clean-target-libgomp:
 
 .PHONY: configure-target-libitm maybe-configure-target-libitm
 maybe-configure-target-libitm:
-configure-target-libitm: stage_current
 maybe-configure-target-libitm: configure-target-libitm
 configure-target-libitm: 
 	@: $(MAKE); $(unstage)
@@ -24029,7 +17257,6 @@ configure-target-libitm:
 
 .PHONY: all-target-libitm maybe-all-target-libitm
 maybe-all-target-libitm:
-all-target-libitm: stage_current
 TARGET-target-libitm=all
 maybe-all-target-libitm: all-target-libitm
 all-target-libitm: configure-target-libitm
@@ -24428,7 +17655,6 @@ maintainer-clean-target-libitm:
 
 .PHONY: configure-target-libatomic maybe-configure-target-libatomic
 maybe-configure-target-libatomic:
-configure-target-libatomic: stage_current
 maybe-configure-target-libatomic: configure-target-libatomic
 configure-target-libatomic: 
 	@r=`${PWD_COMMAND}`; export r; \
@@ -24500,7 +17726,6 @@ maybe-configure-stageautofeedback-target-libatomic:
 
 .PHONY: all-target-libatomic maybe-all-target-libatomic
 maybe-all-target-libatomic:
-all-target-libatomic: stage_current
 TARGET-target-libatomic=all
 maybe-all-target-libatomic: all-target-libatomic
 all-target-libatomic: configure-target-libatomic
@@ -24954,7 +18179,6 @@ maintainer-clean-target-libatomic:
 
 .PHONY: configure-target-libgrust maybe-configure-target-libgrust
 maybe-configure-target-libgrust:
-configure-target-libgrust: stage_current
 
 
 
@@ -24962,7 +18186,6 @@ configure-target-libgrust: stage_current
 
 .PHONY: all-target-libgrust maybe-all-target-libgrust
 maybe-all-target-libgrust:
-all-target-libgrust: stage_current
 
 
 
@@ -25041,6 +18264,17 @@ check-target-libitm-c++:
 # GCC module
 # ----------
 
+.PHONY: cross
+cross: all-build all-gas all-ld
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	echo "Building the C and C++ compiler"; \
+	cd gcc && $(MAKE) $(GCC_FLAGS_TO_PASS) LANGUAGES="c c++"
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	echo "Building runtime libraries"; \
+	$(MAKE) $(RECURSE_FLAGS_TO_PASS) LANGUAGES="c c++" all
 
 
 .PHONY: gcc-site.exp
@@ -25170,9 +18404,6 @@ unstage = :
 stage = :
 current_stage = ""
 
-unstage = if [ -f stage_last ]; then [ -f stage_current ] || $(MAKE) `cat stage_last`-start || exit 1; else :; fi
-stage = if [ -f stage_current ]; then $(MAKE) `cat stage_current`-end || exit 1; else :; fi
-current_stage = "`cat stage_current 2> /dev/null`"
 
 .PHONY: unstage stage
 unstage:
@@ -25293,19 +18524,6 @@ do-clean: clean-stage1
 # only possibility, but now it conflicts with no-bootstrap rules
 
 
-
-
-# Rules to wipe a stage and all the following ones, also used for cleanstrap
-
-.PHONY: distclean-stage1
-distclean-stage1::
-	@: $(MAKE); $(stage)
-	@test "`cat stage_last`" != stage1 || rm -f stage_last
-	rm -rf stage1-* 
-
-
-
-
 .PHONY: stage2-start stage2-end
 
 stage2-start::
@@ -25416,42 +18634,6 @@ do-clean: clean-stage2
 
 # FIXME: Will not need to be conditional when toplevel bootstrap is the
 # only possibility, but now it conflicts with no-bootstrap rules
-
-
-
-.PHONY: bootstrap2 bootstrap2-lean
-bootstrap2:
-	echo stage2 > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) stage2-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-bootstrap2-lean:
-	echo stage2 > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) LEAN=: stage2-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE2_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-
-# Rules to wipe a stage and all the following ones, also used for cleanstrap
-distclean-stage1:: distclean-stage2 
-.PHONY: distclean-stage2
-distclean-stage2::
-	@: $(MAKE); $(stage)
-	@test "`cat stage_last`" != stage2 || rm -f stage_last
-	rm -rf stage2-* 
-
-
 
 
 .PHONY: stage3-start stage3-end
@@ -25570,93 +18752,6 @@ do-clean: clean-stage3
 # FIXME: Will not need to be conditional when toplevel bootstrap is the
 # only possibility, but now it conflicts with no-bootstrap rules
 
-compare:
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	if test -f stage2-lean; then \
-	  echo Cannot compare object files as stage 2 was deleted.; \
-	  exit 0; \
-	fi; \
-	: $(MAKE); $(stage); \
-	rm -f .bad_compare; \
-	echo Comparing stages 2 and 3; \
-        sed=`echo stage3 | sed 's,^stage,,;s,.,.,g'`; \
-	files=`find stage3-* -name "*$(objext)" -print | \
-		 sed -n s,^stage$$sed-,,p`; \
-	for file in $${files} ${extra-compare}; do \
-	  f1=$$r/stage2-$$file; f2=$$r/stage3-$$file; \
-	  if test ! -f $$f1; then continue; fi; \
-	  $(do-compare) > /dev/null 2>&1; \
-	  if test $$? -eq 1; then \
-	    case $$file in \
-	      gcc/cc*-checksum$(objext) | gcc/ada/*tools/* | gcc/m2/gm2-compiler-boot/M2Version* | gcc/m2/gm2-compiler-boot/SYSTEM* | gcc/m2/gm2version*) \
-	        echo warning: $$file differs ;; \
-	      *) \
-	        echo $$file differs >> .bad_compare ;; \
-	    esac; \
-	  fi; \
-	done; \
-	if [ -f .bad_compare ]; then \
-	  echo "Bootstrap comparison failure!"; \
-	  cat .bad_compare; \
-	  exit 1; \
-	else \
-	  echo Comparison successful.; \
-	fi; \
-	$(STAMP) compare
-	if $(LEAN); then \
-	  rm -rf stage2-*; \
-	  $(STAMP) stage2-lean; \
-	fi
-
-
-
-.PHONY: bootstrap bootstrap-lean
-bootstrap:
-	echo stage3 > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) stage3-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-bootstrap-lean:
-	echo stage3 > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) LEAN=: stage3-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-
-# Rules to wipe a stage and all the following ones, also used for cleanstrap
-distclean-stage2:: distclean-stage3 
-.PHONY: distclean-stage3
-distclean-stage3::
-	@: $(MAKE); $(stage)
-	@test "`cat stage_last`" != stage3 || rm -f stage_last
-	rm -rf stage3-* compare 
-
-
-.PHONY: cleanstrap
-cleanstrap: do-distclean local-clean
-	echo stage3 > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) stage3-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE3_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-
 
 .PHONY: stage4-start stage4-end
 
@@ -25774,81 +18869,6 @@ do-clean: clean-stage4
 # FIXME: Will not need to be conditional when toplevel bootstrap is the
 # only possibility, but now it conflicts with no-bootstrap rules
 
-compare3:
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	if test -f stage3-lean; then \
-	  echo Cannot compare object files as stage 3 was deleted.; \
-	  exit 0; \
-	fi; \
-	: $(MAKE); $(stage); \
-	rm -f .bad_compare; \
-	echo Comparing stages 3 and 4; \
-        sed=`echo stage4 | sed 's,^stage,,;s,.,.,g'`; \
-	files=`find stage4-* -name "*$(objext)" -print | \
-		 sed -n s,^stage$$sed-,,p`; \
-	for file in $${files} ${extra-compare}; do \
-	  f1=$$r/stage3-$$file; f2=$$r/stage4-$$file; \
-	  if test ! -f $$f1; then continue; fi; \
-	  $(do-compare3) > /dev/null 2>&1; \
-	  if test $$? -eq 1; then \
-	    case $$file in \
-	      gcc/cc*-checksum$(objext) | gcc/ada/*tools/* | gcc/m2/gm2-compiler-boot/M2Version* | gcc/m2/gm2-compiler-boot/SYSTEM* | gcc/m2/gm2version*) \
-	        echo warning: $$file differs ;; \
-	      *) \
-	        echo $$file differs >> .bad_compare ;; \
-	    esac; \
-	  fi; \
-	done; \
-	if [ -f .bad_compare ]; then \
-	  echo "Bootstrap comparison failure!"; \
-	  cat .bad_compare; \
-	  exit 1; \
-	else \
-	  echo Comparison successful.; \
-	fi; \
-	$(STAMP) compare3
-	if $(LEAN); then \
-	  rm -rf stage3-*; \
-	  $(STAMP) stage3-lean; \
-	fi
-
-
-
-.PHONY: bootstrap4 bootstrap4-lean
-bootstrap4:
-	echo stage4 > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) stage4-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-bootstrap4-lean:
-	echo stage4 > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) LEAN=: stage4-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGE4_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-
-# Rules to wipe a stage and all the following ones, also used for cleanstrap
-distclean-stage3:: distclean-stage4 
-.PHONY: distclean-stage4
-distclean-stage4::
-	@: $(MAKE); $(stage)
-	@test "`cat stage_last`" != stage4 || rm -f stage_last
-	rm -rf stage4-* compare3 
-
-
-
 
 .PHONY: stageprofile-start stageprofile-end
 
@@ -25960,19 +18980,6 @@ do-clean: clean-stageprofile
 
 # FIXME: Will not need to be conditional when toplevel bootstrap is the
 # only possibility, but now it conflicts with no-bootstrap rules
-
-
-
-
-# Rules to wipe a stage and all the following ones, also used for cleanstrap
-distclean-stage1:: distclean-stageprofile 
-.PHONY: distclean-stageprofile
-distclean-stageprofile::
-	@: $(MAKE); $(stage)
-	@test "`cat stage_last`" != stageprofile || rm -f stage_last
-	rm -rf stageprofile-* 
-
-
 
 
 .PHONY: stagetrain-start stagetrain-end
@@ -26087,19 +19094,6 @@ do-clean: clean-stagetrain
 # only possibility, but now it conflicts with no-bootstrap rules
 
 
-
-
-# Rules to wipe a stage and all the following ones, also used for cleanstrap
-distclean-stageprofile:: distclean-stagetrain 
-.PHONY: distclean-stagetrain
-distclean-stagetrain::
-	@: $(MAKE); $(stage)
-	@test "`cat stage_last`" != stagetrain || rm -f stage_last
-	rm -rf stagetrain-* 
-
-
-
-
 .PHONY: stagefeedback-start stagefeedback-end
 
 stagefeedback-start::
@@ -26212,42 +19206,6 @@ do-clean: clean-stagefeedback
 # only possibility, but now it conflicts with no-bootstrap rules
 
 
-
-.PHONY: profiledbootstrap profiledbootstrap-lean
-profiledbootstrap:
-	echo stagefeedback > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) stagefeedback-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-profiledbootstrap-lean:
-	echo stagefeedback > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) LEAN=: stagefeedback-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEfeedback_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-
-# Rules to wipe a stage and all the following ones, also used for cleanstrap
-distclean-stagetrain:: distclean-stagefeedback 
-.PHONY: distclean-stagefeedback
-distclean-stagefeedback::
-	@: $(MAKE); $(stage)
-	@test "`cat stage_last`" != stagefeedback || rm -f stage_last
-	rm -rf stagefeedback-* 
-
-
-
-
 .PHONY: stageautoprofile-start stageautoprofile-end
 
 stageautoprofile-start::
@@ -26358,19 +19316,6 @@ do-clean: clean-stageautoprofile
 
 # FIXME: Will not need to be conditional when toplevel bootstrap is the
 # only possibility, but now it conflicts with no-bootstrap rules
-
-
-
-
-# Rules to wipe a stage and all the following ones, also used for cleanstrap
-distclean-stage1:: distclean-stageautoprofile 
-.PHONY: distclean-stageautoprofile
-distclean-stageautoprofile::
-	@: $(MAKE); $(stage)
-	@test "`cat stage_last`" != stageautoprofile || rm -f stage_last
-	rm -rf stageautoprofile-* 
-
-
 
 
 .PHONY: stageautofeedback-start stageautofeedback-end
@@ -26486,42 +19431,6 @@ do-clean: clean-stageautofeedback
 
 
 
-.PHONY: autoprofiledbootstrap autoprofiledbootstrap-lean
-autoprofiledbootstrap:
-	echo stageautofeedback > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) stageautofeedback-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-autoprofiledbootstrap-lean:
-	echo stageautofeedback > stage_final
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) LEAN=: stageautofeedback-bubble
-	@: $(MAKE); $(unstage)
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	TFLAGS="$(STAGEautofeedback_TFLAGS)"; \
-	$(MAKE) $(TARGET_FLAGS_TO_PASS) all-host all-target
-
-
-# Rules to wipe a stage and all the following ones, also used for cleanstrap
-distclean-stageautoprofile:: distclean-stageautofeedback 
-.PHONY: distclean-stageautofeedback
-distclean-stageautofeedback::
-	@: $(MAKE); $(stage)
-	@test "`cat stage_last`" != stageautofeedback || rm -f stage_last
-	rm -rf stageautofeedback-* 
-
-
-
-
-
 stageprofile-end::
 	$(MAKE) distclean-stagefeedback
 
@@ -26535,128 +19444,37 @@ stagefeedback-start::
 	  { find . -name '*.*da' | sed 's,.*,$(LN) -f "&" "../'$$j'/&",' | $(SHELL); }; \
 	done
 
-do-distclean: distclean-stage1
-
-# Provide a GCC build when we're building target libraries.  This does
-# not work as a dependency, just as the minimum necessary to avoid errors.
-stage_last:
-	@r=`${PWD_COMMAND}`; export r; \
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
-	$(MAKE) $(RECURSE_FLAGS_TO_PASS) stage1-bubble
-
-# Same as unstage, but not phony and defaulting to stage1-start.  We place
-# it in the dependency so that for example `make -j3 all-gcc' works.
-stage_current:
-	@if test -f stage_last; then $(unstage); else $(MAKE) stage1-start; fi
-
-.PHONY: restrap
-restrap::
-	@: $(MAKE); $(stage)
-	rm -rf stage1-$(TARGET_SUBDIR) stage2-* stage3-* stage4-* stageprofile-* stagetrain-* stagefeedback-* stageautoprofile-* stageautofeedback-*
-restrap:: all
 
 # --------------------------------------
 # Dependencies between different modules
 # --------------------------------------
 
 # Generic dependencies for target modules on host stuff, especially gcc
-configure-stage1-target-libstdc++-v3: maybe-all-stage1-gcc
-configure-stage2-target-libstdc++-v3: maybe-all-stage2-gcc
-configure-stage3-target-libstdc++-v3: maybe-all-stage3-gcc
-configure-stage4-target-libstdc++-v3: maybe-all-stage4-gcc
-configure-stageprofile-target-libstdc++-v3: maybe-all-stageprofile-gcc
-configure-stagetrain-target-libstdc++-v3: maybe-all-stagetrain-gcc
-configure-stagefeedback-target-libstdc++-v3: maybe-all-stagefeedback-gcc
-configure-stageautoprofile-target-libstdc++-v3: maybe-all-stageautoprofile-gcc
-configure-stageautofeedback-target-libstdc++-v3: maybe-all-stageautofeedback-gcc
-configure-stage1-target-libsanitizer: maybe-all-stage1-gcc
-configure-stage2-target-libsanitizer: maybe-all-stage2-gcc
-configure-stage3-target-libsanitizer: maybe-all-stage3-gcc
-configure-stage4-target-libsanitizer: maybe-all-stage4-gcc
-configure-stageprofile-target-libsanitizer: maybe-all-stageprofile-gcc
-configure-stagetrain-target-libsanitizer: maybe-all-stagetrain-gcc
-configure-stagefeedback-target-libsanitizer: maybe-all-stagefeedback-gcc
-configure-stageautoprofile-target-libsanitizer: maybe-all-stageautoprofile-gcc
-configure-stageautofeedback-target-libsanitizer: maybe-all-stageautofeedback-gcc
-configure-stage1-target-libvtv: maybe-all-stage1-gcc
-configure-stage2-target-libvtv: maybe-all-stage2-gcc
-configure-stage3-target-libvtv: maybe-all-stage3-gcc
-configure-stage4-target-libvtv: maybe-all-stage4-gcc
-configure-stageprofile-target-libvtv: maybe-all-stageprofile-gcc
-configure-stagetrain-target-libvtv: maybe-all-stagetrain-gcc
-configure-stagefeedback-target-libvtv: maybe-all-stagefeedback-gcc
-configure-stageautoprofile-target-libvtv: maybe-all-stageautoprofile-gcc
-configure-stageautofeedback-target-libvtv: maybe-all-stageautofeedback-gcc
-configure-target-libssp: stage_last
-configure-target-newlib: stage_last
-configure-stage1-target-libgcc: maybe-all-stage1-gcc
-configure-stage2-target-libgcc: maybe-all-stage2-gcc
-configure-stage3-target-libgcc: maybe-all-stage3-gcc
-configure-stage4-target-libgcc: maybe-all-stage4-gcc
-configure-stageprofile-target-libgcc: maybe-all-stageprofile-gcc
-configure-stagetrain-target-libgcc: maybe-all-stagetrain-gcc
-configure-stagefeedback-target-libgcc: maybe-all-stagefeedback-gcc
-configure-stageautoprofile-target-libgcc: maybe-all-stageautoprofile-gcc
-configure-stageautofeedback-target-libgcc: maybe-all-stageautofeedback-gcc
-configure-stage1-target-libbacktrace: maybe-all-stage1-gcc
-configure-stage2-target-libbacktrace: maybe-all-stage2-gcc
-configure-stage3-target-libbacktrace: maybe-all-stage3-gcc
-configure-stage4-target-libbacktrace: maybe-all-stage4-gcc
-configure-stageprofile-target-libbacktrace: maybe-all-stageprofile-gcc
-configure-stagetrain-target-libbacktrace: maybe-all-stagetrain-gcc
-configure-stagefeedback-target-libbacktrace: maybe-all-stagefeedback-gcc
-configure-stageautoprofile-target-libbacktrace: maybe-all-stageautoprofile-gcc
-configure-stageautofeedback-target-libbacktrace: maybe-all-stageautofeedback-gcc
-configure-target-libquadmath: stage_last
-configure-target-libgfortran: stage_last
-configure-target-libobjc: stage_last
-configure-target-libgo: stage_last
-configure-stage1-target-libphobos: maybe-all-stage1-gcc
-configure-stage2-target-libphobos: maybe-all-stage2-gcc
-configure-stage3-target-libphobos: maybe-all-stage3-gcc
-configure-stage4-target-libphobos: maybe-all-stage4-gcc
-configure-stageprofile-target-libphobos: maybe-all-stageprofile-gcc
-configure-stagetrain-target-libphobos: maybe-all-stagetrain-gcc
-configure-stagefeedback-target-libphobos: maybe-all-stagefeedback-gcc
-configure-stageautoprofile-target-libphobos: maybe-all-stageautoprofile-gcc
-configure-stageautofeedback-target-libphobos: maybe-all-stageautofeedback-gcc
-configure-target-libtermcap: stage_last
-configure-target-winsup: stage_last
-configure-target-libgloss: stage_last
-configure-target-libffi: stage_last
-configure-stage1-target-zlib: maybe-all-stage1-gcc
-configure-stage2-target-zlib: maybe-all-stage2-gcc
-configure-stage3-target-zlib: maybe-all-stage3-gcc
-configure-stage4-target-zlib: maybe-all-stage4-gcc
-configure-stageprofile-target-zlib: maybe-all-stageprofile-gcc
-configure-stagetrain-target-zlib: maybe-all-stagetrain-gcc
-configure-stagefeedback-target-zlib: maybe-all-stagefeedback-gcc
-configure-stageautoprofile-target-zlib: maybe-all-stageautoprofile-gcc
-configure-stageautofeedback-target-zlib: maybe-all-stageautofeedback-gcc
-configure-target-rda: stage_last
-configure-target-libada: stage_last
-configure-target-libgm2: stage_last
-configure-stage1-target-libgomp: maybe-all-stage1-gcc
-configure-stage2-target-libgomp: maybe-all-stage2-gcc
-configure-stage3-target-libgomp: maybe-all-stage3-gcc
-configure-stage4-target-libgomp: maybe-all-stage4-gcc
-configure-stageprofile-target-libgomp: maybe-all-stageprofile-gcc
-configure-stagetrain-target-libgomp: maybe-all-stagetrain-gcc
-configure-stagefeedback-target-libgomp: maybe-all-stagefeedback-gcc
-configure-stageautoprofile-target-libgomp: maybe-all-stageautoprofile-gcc
-configure-stageautofeedback-target-libgomp: maybe-all-stageautofeedback-gcc
-configure-target-libitm: stage_last
-configure-stage1-target-libatomic: maybe-all-stage1-gcc
-configure-stage2-target-libatomic: maybe-all-stage2-gcc
-configure-stage3-target-libatomic: maybe-all-stage3-gcc
-configure-stage4-target-libatomic: maybe-all-stage4-gcc
-configure-stageprofile-target-libatomic: maybe-all-stageprofile-gcc
-configure-stagetrain-target-libatomic: maybe-all-stagetrain-gcc
-configure-stagefeedback-target-libatomic: maybe-all-stagefeedback-gcc
-configure-stageautoprofile-target-libatomic: maybe-all-stageautoprofile-gcc
-configure-stageautofeedback-target-libatomic: maybe-all-stageautofeedback-gcc
-configure-target-libgrust: stage_last
 
+configure-target-libstdc++-v3: maybe-all-gcc
+configure-target-libsanitizer: maybe-all-gcc
+configure-target-libvtv: maybe-all-gcc
+configure-target-libssp: maybe-all-gcc
+configure-target-newlib: maybe-all-gcc
+configure-target-libgcc: maybe-all-gcc
+configure-target-libbacktrace: maybe-all-gcc
+configure-target-libquadmath: maybe-all-gcc
+configure-target-libgfortran: maybe-all-gcc
+configure-target-libobjc: maybe-all-gcc
+configure-target-libgo: maybe-all-gcc
+configure-target-libphobos: maybe-all-gcc
+configure-target-libtermcap: maybe-all-gcc
+configure-target-winsup: maybe-all-gcc
+configure-target-libgloss: maybe-all-gcc
+configure-target-libffi: maybe-all-gcc
+configure-target-zlib: maybe-all-gcc
+configure-target-rda: maybe-all-gcc
+configure-target-libada: maybe-all-gcc
+configure-target-libgm2: maybe-all-gcc
+configure-target-libgomp: maybe-all-gcc
+configure-target-libitm: maybe-all-gcc
+configure-target-libatomic: maybe-all-gcc
+configure-target-libgrust: maybe-all-gcc
 
 
 # There are two types of dependencies here: 'hard' dependencies, where one
@@ -27905,109 +20723,94 @@ all-target-winsup: maybe-all-target-libtermcap
 configure-target-libgfortran: maybe-all-target-libquadmath
 
 
-configure-gnattools: stage_last
-configure-libcc1: stage_last
-configure-c++tools: stage_last
-configure-utils: stage_last
-configure-gdb: stage_last
-configure-gdbserver: stage_last
-configure-gdbsupport: stage_last
-configure-gprof: stage_last
-configure-gprofng: stage_last
-configure-sid: stage_last
-configure-sim: stage_last
-configure-fastjar: stage_last
-configure-bison: stage_last
-configure-flex: stage_last
-configure-m4: stage_last
 
+
+all-gnattools: maybe-all-target-libstdc++-v3
+configure-libcc1: maybe-configure-gcc
+all-libcc1: maybe-all-gcc
+all-c++tools: maybe-all-gcc
+all-utils: maybe-all-libiberty
+configure-gdb: maybe-all-gmp
+configure-gdb: maybe-all-mpfr
+configure-gdb: maybe-all-gettext
+configure-gdb: maybe-all-bfd
+configure-gdb: maybe-all-libiconv
+all-gdb: maybe-all-libiberty
+all-gdb: maybe-all-libiconv
+all-gdb: maybe-all-opcodes
+all-gdb: maybe-all-libdecnumber
+all-gdb: maybe-all-libctf
+all-gdb: maybe-all-libbacktrace
+all-gdbserver: maybe-all-libiberty
+configure-gdbsupport: maybe-configure-gettext
+all-gdbsupport: maybe-all-gettext
+configure-gprof: maybe-configure-gettext
+all-gprof: maybe-all-libiberty
+all-gprof: maybe-all-bfd
+all-gprof: maybe-all-opcodes
+all-gprof: maybe-all-gettext
+all-gprof: maybe-all-gas
+configure-gprofng: maybe-configure-gettext
+all-gprofng: maybe-all-libiberty
+all-gprofng: maybe-all-bfd
+all-gprofng: maybe-all-opcodes
+all-gprofng: maybe-all-gettext
+all-gprofng: maybe-all-gas
+all-sid: maybe-all-libiberty
+all-sid: maybe-all-bfd
+all-sid: maybe-all-opcodes
+configure-sim: maybe-configure-gettext
+all-sim: maybe-all-gettext
+all-sim: maybe-all-libiberty
+all-sim: maybe-all-bfd
+all-sim: maybe-all-opcodes
+all-fastjar: maybe-all-zlib
+all-fastjar: maybe-all-libiberty
+all-bison: maybe-all-gettext
+all-flex: maybe-all-gettext
+all-m4: maybe-all-gettext
 configure-target-fastjar: maybe-configure-target-zlib
 all-target-fastjar: maybe-all-target-zlib
+configure-target-libgo: maybe-all-target-libstdc++-v3
 all-target-libgo: maybe-all-target-libbacktrace
 all-target-libgo: maybe-all-target-libatomic
+configure-target-libgm2: maybe-all-target-libstdc++-v3
 all-target-libgm2: maybe-all-target-libatomic
+configure-target-libgrust: maybe-all-target-libstdc++-v3
+configure-target-newlib: maybe-all-binutils
+configure-target-newlib: maybe-all-ld
 configure-target-libgfortran: maybe-all-target-libbacktrace
 configure-target-libgo: maybe-all-target-libbacktrace
-
 
 # Dependencies for target modules on other target modules are
 # described by lang_env_dependencies; the defaults apply to anything
 # not mentioned there.
 
 
-configure-stage1-target-libstdc++-v3: maybe-all-stage1-target-libgcc
-configure-stage2-target-libstdc++-v3: maybe-all-stage2-target-libgcc
-configure-stage3-target-libstdc++-v3: maybe-all-stage3-target-libgcc
-configure-stage4-target-libstdc++-v3: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libstdc++-v3: maybe-all-stageprofile-target-libgcc
-configure-stagetrain-target-libstdc++-v3: maybe-all-stagetrain-target-libgcc
-configure-stagefeedback-target-libstdc++-v3: maybe-all-stagefeedback-target-libgcc
-configure-stageautoprofile-target-libstdc++-v3: maybe-all-stageautoprofile-target-libgcc
-configure-stageautofeedback-target-libstdc++-v3: maybe-all-stageautofeedback-target-libgcc
-configure-stage1-target-libsanitizer: maybe-all-stage1-target-libgcc
-configure-stage2-target-libsanitizer: maybe-all-stage2-target-libgcc
-configure-stage3-target-libsanitizer: maybe-all-stage3-target-libgcc
-configure-stage4-target-libsanitizer: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libsanitizer: maybe-all-stageprofile-target-libgcc
-configure-stagetrain-target-libsanitizer: maybe-all-stagetrain-target-libgcc
-configure-stagefeedback-target-libsanitizer: maybe-all-stagefeedback-target-libgcc
-configure-stageautoprofile-target-libsanitizer: maybe-all-stageautoprofile-target-libgcc
-configure-stageautofeedback-target-libsanitizer: maybe-all-stageautofeedback-target-libgcc
-configure-stage1-target-libvtv: maybe-all-stage1-target-libgcc
-configure-stage2-target-libvtv: maybe-all-stage2-target-libgcc
-configure-stage3-target-libvtv: maybe-all-stage3-target-libgcc
-configure-stage4-target-libvtv: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libvtv: maybe-all-stageprofile-target-libgcc
-configure-stagetrain-target-libvtv: maybe-all-stagetrain-target-libgcc
-configure-stagefeedback-target-libvtv: maybe-all-stagefeedback-target-libgcc
-configure-stageautoprofile-target-libvtv: maybe-all-stageautoprofile-target-libgcc
-configure-stageautofeedback-target-libvtv: maybe-all-stageautofeedback-target-libgcc
-configure-stage1-target-libbacktrace: maybe-all-stage1-target-libgcc
-configure-stage2-target-libbacktrace: maybe-all-stage2-target-libgcc
-configure-stage3-target-libbacktrace: maybe-all-stage3-target-libgcc
-configure-stage4-target-libbacktrace: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libbacktrace: maybe-all-stageprofile-target-libgcc
-configure-stagetrain-target-libbacktrace: maybe-all-stagetrain-target-libgcc
-configure-stagefeedback-target-libbacktrace: maybe-all-stagefeedback-target-libgcc
-configure-stageautoprofile-target-libbacktrace: maybe-all-stageautoprofile-target-libgcc
-configure-stageautofeedback-target-libbacktrace: maybe-all-stageautofeedback-target-libgcc
-configure-stage1-target-libphobos: maybe-all-stage1-target-libgcc
-configure-stage2-target-libphobos: maybe-all-stage2-target-libgcc
-configure-stage3-target-libphobos: maybe-all-stage3-target-libgcc
-configure-stage4-target-libphobos: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libphobos: maybe-all-stageprofile-target-libgcc
-configure-stagetrain-target-libphobos: maybe-all-stagetrain-target-libgcc
-configure-stagefeedback-target-libphobos: maybe-all-stagefeedback-target-libgcc
-configure-stageautoprofile-target-libphobos: maybe-all-stageautoprofile-target-libgcc
-configure-stageautofeedback-target-libphobos: maybe-all-stageautofeedback-target-libgcc
-configure-stage1-target-zlib: maybe-all-stage1-target-libgcc
-configure-stage2-target-zlib: maybe-all-stage2-target-libgcc
-configure-stage3-target-zlib: maybe-all-stage3-target-libgcc
-configure-stage4-target-zlib: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-zlib: maybe-all-stageprofile-target-libgcc
-configure-stagetrain-target-zlib: maybe-all-stagetrain-target-libgcc
-configure-stagefeedback-target-zlib: maybe-all-stagefeedback-target-libgcc
-configure-stageautoprofile-target-zlib: maybe-all-stageautoprofile-target-libgcc
-configure-stageautofeedback-target-zlib: maybe-all-stageautofeedback-target-libgcc
-configure-stage1-target-libgomp: maybe-all-stage1-target-libgcc
-configure-stage2-target-libgomp: maybe-all-stage2-target-libgcc
-configure-stage3-target-libgomp: maybe-all-stage3-target-libgcc
-configure-stage4-target-libgomp: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libgomp: maybe-all-stageprofile-target-libgcc
-configure-stagetrain-target-libgomp: maybe-all-stagetrain-target-libgcc
-configure-stagefeedback-target-libgomp: maybe-all-stagefeedback-target-libgcc
-configure-stageautoprofile-target-libgomp: maybe-all-stageautoprofile-target-libgcc
-configure-stageautofeedback-target-libgomp: maybe-all-stageautofeedback-target-libgcc
-configure-stage1-target-libatomic: maybe-all-stage1-target-libgcc
-configure-stage2-target-libatomic: maybe-all-stage2-target-libgcc
-configure-stage3-target-libatomic: maybe-all-stage3-target-libgcc
-configure-stage4-target-libatomic: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libatomic: maybe-all-stageprofile-target-libgcc
-configure-stagetrain-target-libatomic: maybe-all-stagetrain-target-libgcc
-configure-stagefeedback-target-libatomic: maybe-all-stagefeedback-target-libgcc
-configure-stageautoprofile-target-libatomic: maybe-all-stageautoprofile-target-libgcc
-configure-stageautofeedback-target-libatomic: maybe-all-stageautofeedback-target-libgcc
 
+configure-target-libstdc++-v3: maybe-all-target-libgcc
+configure-target-libsanitizer: maybe-all-target-libgcc
+configure-target-libvtv: maybe-all-target-libgcc
+configure-target-libssp: maybe-all-target-libgcc
+configure-target-newlib: maybe-all-target-libgcc
+configure-target-libbacktrace: maybe-all-target-libgcc
+configure-target-libquadmath: maybe-all-target-libgcc
+configure-target-libgfortran: maybe-all-target-libgcc
+configure-target-libobjc: maybe-all-target-libgcc
+configure-target-libgo: maybe-all-target-libgcc
+configure-target-libphobos: maybe-all-target-libgcc
+configure-target-libtermcap: maybe-all-target-libgcc
+configure-target-winsup: maybe-all-target-libgcc
+configure-target-libgloss: maybe-all-target-libgcc
+configure-target-libffi: maybe-all-target-libgcc
+configure-target-zlib: maybe-all-target-libgcc
+configure-target-rda: maybe-all-target-libgcc
+configure-target-libada: maybe-all-target-libgcc
+configure-target-libgm2: maybe-all-target-libgcc
+configure-target-libgomp: maybe-all-target-libgcc
+configure-target-libitm: maybe-all-target-libgcc
+configure-target-libatomic: maybe-all-target-libgcc
+configure-target-libgrust: maybe-all-target-libgcc
 
 
 configure-target-libstdc++-v3: maybe-all-target-newlib maybe-all-target-libgloss

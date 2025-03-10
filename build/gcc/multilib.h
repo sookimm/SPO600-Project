@@ -1,7 +1,7 @@
 static const char *const multilib_raw[] = {
 ". !m64 !m32;",
-".:../lib64 m64 !m32;",
-".:../lib !m64 m32;",
+"64:../lib64 m64 !m32;",
+"32:../lib !m64 m32;",
 NULL
 };
 

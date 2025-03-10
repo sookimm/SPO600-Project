@@ -32,10 +32,10 @@ AUTOCONF = autoconf
 AUTOHEADER = autoheader
 CATALOGS = $(patsubst %,po/%, be.gmo ca.gmo da.gmo de.gmo el.gmo eo.gmo es.gmo fi.gmo fr.gmo id.gmo ja.gmo ka.gmo nl.gmo pt_BR.gmo ro.gmo ru.gmo sr.gmo sv.gmo tr.gmo uk.gmo vi.gmo zh_CN.gmo zh_TW.gmo)
 CC = gcc
-CFLAGS = -g
+CFLAGS = -g -O2    
 WARN_CFLAGS = -W -Wall -Wno-narrowing -Wwrite-strings -Wmissing-format-attribute -Wstrict-prototypes -Wmissing-prototypes -Wold-style-definition -Wc++-compat -pedantic -Wno-long-long 
-CXX = g++ -std=c++14
-CXXFLAGS = -g
+CXX = g++
+CXXFLAGS = -g -O2    
 WARN_CXXFLAGS = -W -Wall -Wno-narrowing -Wwrite-strings -Wmissing-format-attribute -pedantic -Wno-long-long 
 CPP = gcc -E
 CPPFLAGS = 

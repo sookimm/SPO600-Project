@@ -54,10 +54,10 @@ AR = ar --plugin /usr/libexec/gcc/x86_64-redhat-linux/14/liblto_plugin.so --plug
 AR_FLAGS = rc
 
 CC = gcc
-CFLAGS = -g
+CFLAGS = -g -O2    
 CPPFLAGS = 
 RANLIB = ranlib --plugin /usr/libexec/gcc/x86_64-redhat-linux/14/liblto_plugin.so --plugin /usr/libexec/gcc/x86_64-redhat-linux/14/liblto_plugin.so
-MAKEINFO = /home/skim499/gcc-custom-pass/src/missing makeinfo --split-size=5000000 --split-size=5000000
+MAKEINFO = /home/skim499/gcc-custom-pass/src/missing makeinfo --split-size=5000000
 PERL = perl
 
 PICFLAG = -fpic

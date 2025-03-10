@@ -36,7 +36,8 @@ libz_a-adler32.o: ../../src/zlib/adler32.c /usr/include/stdc-predef.h \
  /usr/include/strings.h /usr/include/stdlib.h \
  /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
  /usr/include/bits/floatn.h /usr/include/bits/floatn-common.h \
- /usr/include/alloca.h /usr/include/bits/stdlib-float.h
+ /usr/include/alloca.h /usr/include/bits/stdlib-bsearch.h \
+ /usr/include/bits/stdlib-float.h
 /usr/include/stdc-predef.h:
 ../../src/zlib/zutil.h:
 ../../src/zlib/zlib.h:
@@ -104,4 +105,5 @@ libz_a-adler32.o: ../../src/zlib/adler32.c /usr/include/stdc-predef.h \
 /usr/include/bits/floatn.h:
 /usr/include/bits/floatn-common.h:
 /usr/include/alloca.h:
+/usr/include/bits/stdlib-bsearch.h:
 /usr/include/bits/stdlib-float.h:

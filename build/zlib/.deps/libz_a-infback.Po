@@ -36,9 +36,10 @@ libz_a-infback.o: ../../src/zlib/infback.c /usr/include/stdc-predef.h \
  /usr/include/strings.h /usr/include/stdlib.h \
  /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
  /usr/include/bits/floatn.h /usr/include/bits/floatn-common.h \
- /usr/include/alloca.h /usr/include/bits/stdlib-float.h \
- ../../src/zlib/inftrees.h ../../src/zlib/inflate.h \
- ../../src/zlib/inffast.h ../../src/zlib/inffixed.h
+ /usr/include/alloca.h /usr/include/bits/stdlib-bsearch.h \
+ /usr/include/bits/stdlib-float.h ../../src/zlib/inftrees.h \
+ ../../src/zlib/inflate.h ../../src/zlib/inffast.h \
+ ../../src/zlib/inffixed.h
 /usr/include/stdc-predef.h:
 ../../src/zlib/zutil.h:
 ../../src/zlib/zlib.h:
@@ -106,6 +107,7 @@ libz_a-infback.o: ../../src/zlib/infback.c /usr/include/stdc-predef.h \
 /usr/include/bits/floatn.h:
 /usr/include/bits/floatn-common.h:
 /usr/include/alloca.h:
+/usr/include/bits/stdlib-bsearch.h:
 /usr/include/bits/stdlib-float.h:
 ../../src/zlib/inftrees.h:
 ../../src/zlib/inflate.h:

@@ -37,8 +37,8 @@ libz_a-trees.o: ../../src/zlib/trees.c /usr/include/stdc-predef.h \
  /usr/include/strings.h /usr/include/stdlib.h \
  /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
  /usr/include/bits/floatn.h /usr/include/bits/floatn-common.h \
- /usr/include/alloca.h /usr/include/bits/stdlib-float.h \
- ../../src/zlib/trees.h
+ /usr/include/alloca.h /usr/include/bits/stdlib-bsearch.h \
+ /usr/include/bits/stdlib-float.h ../../src/zlib/trees.h
 /usr/include/stdc-predef.h:
 ../../src/zlib/deflate.h:
 ../../src/zlib/zutil.h:
@@ -107,5 +107,6 @@ libz_a-trees.o: ../../src/zlib/trees.c /usr/include/stdc-predef.h \
 /usr/include/bits/floatn.h:
 /usr/include/bits/floatn-common.h:
 /usr/include/alloca.h:
+/usr/include/bits/stdlib-bsearch.h:
 /usr/include/bits/stdlib-float.h:
 ../../src/zlib/trees.h:

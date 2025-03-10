@@ -18,7 +18,7 @@ ac_cv_c_uint64_t=${ac_cv_c_uint64_t=yes}
 ac_cv_env_CC_set=set
 ac_cv_env_CC_value=gcc
 ac_cv_env_CFLAGS_set=set
-ac_cv_env_CFLAGS_value=-g
+ac_cv_env_CFLAGS_value='-g -O2    '
 ac_cv_env_CPPFLAGS_set=
 ac_cv_env_CPPFLAGS_value=
 ac_cv_env_CPP_set=

@@ -278,7 +278,7 @@ AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CET_FLAGS = -fcf-protection -mshstk
-CFLAGS = -g
+CFLAGS = -g -O2    
 COMPPATH = .
 CPP = gcc -E
 CPPFLAGS = 
@@ -308,7 +308,7 @@ LIPO =
 LN_S = ln -s
 LTLIBOBJS = 
 MAINT = #
-MAKEINFO = /home/skim499/gcc-custom-pass/src/missing makeinfo --split-size=5000000 --split-size=5000000
+MAKEINFO = /home/skim499/gcc-custom-pass/src/missing makeinfo --split-size=5000000
 MKDIR_P = /usr/bin/mkdir -p
 NM = /usr/bin/nm -B
 NMEDIT = 

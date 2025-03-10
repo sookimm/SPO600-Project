@@ -180,7 +180,7 @@ coverageexts = .{gcda,gcno}
 # apply to the back end and some front ends, which may be compiled
 # with other compilers.
 # C_STRICT_WARN is similar, with C-only warnings.
-LOOSE_WARN = -W -Wall -Wno-error=narrowing -Wwrite-strings -Wcast-qual -Wno-format
+LOOSE_WARN = -W -Wall -Wno-error=narrowing -Wwrite-strings -Wcast-qual
 C_LOOSE_WARN = -Wstrict-prototypes -Wmissing-prototypes
 STRICT_WARN = -Wmissing-format-attribute -Wconditionally-supported -Woverloaded-virtual -pedantic -Wno-long-long -Wno-variadic-macros -Wno-overlength-strings
 C_STRICT_WARN = -Wold-style-definition -Wc++-compat
@@ -267,7 +267,7 @@ CPPFLAGS =
 
 AWK = gawk
 CC = gcc
-CXX = g++ -std=c++14
+CXX = g++
 BISON = bison
 BISONFLAGS =
 FLEX = flex
@@ -427,7 +427,7 @@ ISLINC =
 enable_lto = yes
 
 # Compiler and flags needed for plugin support
-PLUGINCC = g++ -std=c++14
+PLUGINCC = g++
 PLUGINCFLAGS =  -g 
 
 # Libs and linker options needed for plugin support
@@ -2509,7 +2509,7 @@ libgcc.mvars: config.status Makefile specs xgcc$(exeext)
 # switches.
 multilib.h: s-mlib; @true
 s-mlib: $(srcdir)/genmultilib Makefile
-	if test no = yes \
+	if test yes = yes \
 	   || test -n "$(MULTILIB_OSDIRNAMES)"; then \
 	  $(SHELL) $(srcdir)/genmultilib \
 	    "$(MULTILIB_OPTIONS)" \
@@ -2522,7 +2522,7 @@ s-mlib: $(srcdir)/genmultilib Makefile
 	    "$(MULTILIB_REQUIRED)" \
 	    "$(if $(MULTILIB_OSDIRNAMES),,$(MULTIARCH_DIRNAME))" \
 	    "$(MULTILIB_REUSE)" \
-	    "no" \
+	    "yes" \
 	    > tmp-mlib.h; \
 	else \
 	  $(SHELL) $(srcdir)/genmultilib '' '' '' '' '' '' '' '' \

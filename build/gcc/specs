@@ -74,7 +74,7 @@ cc1 -E %{traditional|traditional-cpp:-traditional-cpp}
 15.0.1
 
 *multilib:
-. !m64 !m32;.:../lib64 m64 !m32;.:../lib !m64 m32;
+. !m64 !m32;64:../lib64 m64 !m32;32:../lib !m64 m32;
 
 *multilib_defaults:
 m64

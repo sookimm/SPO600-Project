@@ -31,7 +31,7 @@ VPATH = ../../../src/libiberty/testsuite
 SHELL = /bin/sh
 
 CC = gcc
-CFLAGS = -g
+CFLAGS = -g -O2    
 LIBCFLAGS = $(CFLAGS) $(LDFLAGS)
 
 # Multilib support variables.

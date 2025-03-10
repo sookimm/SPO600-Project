@@ -31,7 +31,7 @@ ac_cv_env_CCC_value=
 ac_cv_env_CC_set=set
 ac_cv_env_CC_value=gcc
 ac_cv_env_CFLAGS_set=set
-ac_cv_env_CFLAGS_value=-g
+ac_cv_env_CFLAGS_value='-g -O2    '
 ac_cv_env_CPPFLAGS_set=
 ac_cv_env_CPPFLAGS_value=
 ac_cv_env_CPP_set=
@@ -39,9 +39,9 @@ ac_cv_env_CPP_value=
 ac_cv_env_CXXCPP_set=
 ac_cv_env_CXXCPP_value=
 ac_cv_env_CXXFLAGS_set=set
-ac_cv_env_CXXFLAGS_value=-g
+ac_cv_env_CXXFLAGS_value='-g -O2    '
 ac_cv_env_CXX_set=set
-ac_cv_env_CXX_value='g++ -std=c++14'
+ac_cv_env_CXX_value=g++
 ac_cv_env_GMPINC_set=set
 ac_cv_env_GMPINC_value=
 ac_cv_env_GMPLIBS_set=set
@@ -174,12 +174,12 @@ ac_cv_prog_AWK=${ac_cv_prog_AWK=gawk}
 ac_cv_prog_BISON=${ac_cv_prog_BISON=bison}
 ac_cv_prog_CC=${ac_cv_prog_CC=gcc}
 ac_cv_prog_CPP=${ac_cv_prog_CPP='gcc -E'}
-ac_cv_prog_CXXCPP=${ac_cv_prog_CXXCPP='g++ -std=c++14 -E'}
+ac_cv_prog_CXXCPP=${ac_cv_prog_CXXCPP='g++ -E'}
 ac_cv_prog_FLEX=${ac_cv_prog_FLEX=flex}
 ac_cv_prog_GDC=${ac_cv_prog_GDC=no}
 ac_cv_prog_GNATBIND=${ac_cv_prog_GNATBIND=no}
 ac_cv_prog_GNATMAKE=${ac_cv_prog_GNATMAKE=no}
-ac_cv_prog_MAKEINFO=${ac_cv_prog_MAKEINFO='/home/skim499/gcc-custom-pass/src/missing makeinfo --split-size=5000000 --split-size=5000000'}
+ac_cv_prog_MAKEINFO=${ac_cv_prog_MAKEINFO='/home/skim499/gcc-custom-pass/src/missing makeinfo --split-size=5000000'}
 ac_cv_prog_NM=${ac_cv_prog_NM=nm}
 ac_cv_prog_OBJDUMP=${ac_cv_prog_OBJDUMP=objdump}
 ac_cv_prog_PYTHON=${ac_cv_prog_PYTHON=python3}
@@ -242,7 +242,6 @@ acx_cv_prog_cc_warning__Wcast_qual=${acx_cv_prog_cc_warning__Wcast_qual=yes}
 acx_cv_prog_cc_warning__Wconditionally_supported=${acx_cv_prog_cc_warning__Wconditionally_supported=yes}
 acx_cv_prog_cc_warning__Wcpp_compat=${acx_cv_prog_cc_warning__Wcpp_compat=yes}
 acx_cv_prog_cc_warning__Werror_narrowing=${acx_cv_prog_cc_warning__Werror_narrowing=yes}
-acx_cv_prog_cc_warning__Wformat=${acx_cv_prog_cc_warning__Wformat=yes}
 acx_cv_prog_cc_warning__Wmissing_format_attribute=${acx_cv_prog_cc_warning__Wmissing_format_attribute=yes}
 acx_cv_prog_cc_warning__Wmissing_prototypes=${acx_cv_prog_cc_warning__Wmissing_prototypes=yes}
 acx_cv_prog_cc_warning__Wold_style_definition=${acx_cv_prog_cc_warning__Wold_style_definition=yes}

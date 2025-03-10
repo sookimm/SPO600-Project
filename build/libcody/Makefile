@@ -13,14 +13,14 @@ LDFLAGS :=   -Wl,--no-undefined
 LIBS := 
 
 # We have to place the -I paths last, so that building will see -I paths to us
-CXX := $(filter-out -I%,g++ -std=c++14 -std=c++11)
+CXX := $(filter-out -I%,g++ -std=c++11)
 AR := ar --plugin /usr/libexec/gcc/x86_64-redhat-linux/14/liblto_plugin.so
 RANLIB := ranlib --plugin /usr/libexec/gcc/x86_64-redhat-linux/14/liblto_plugin.so
 INSTALL := $(srcdir)/build-aux/install-sh
 
 # C++ compiler options
-CXXFLAGS := -g
-CXXINC := $(filter -I%,g++ -std=c++14 -std=c++11)
+CXXFLAGS := -g -O2    
+CXXINC := $(filter -I%,g++ -std=c++11)
 CXXOPTS := $(CXXFLAGS) 
 
 ifneq (,yes)
@@ -104,7 +104,7 @@ Makefile: config.status Makefile.in
 endif
 
 config.status: $(srcdir)/configure $(srcdir)/config.h.in
-	if test -x $@; then ./$@ -recheck; else $<  '--srcdir=../../src/libcody' '--cache-file=./config.cache' '--prefix=/home/skim499/gcc-custom-pass/install' '--disable-multilib' '--program-transform-name=s,y,y,' '--disable-option-checking' '--disable-year2038' '--build=x86_64-pc-linux-gnu' '--host=x86_64-pc-linux-gnu' '--target=x86_64-pc-linux-gnu' '--enable-checking=yes,types,extra' '--disable-coverage' '--enable-languages=c,c++,lto' '--disable-build-format-warnings' 'build_alias=x86_64-pc-linux-gnu' 'host_alias=x86_64-pc-linux-gnu' 'target_alias=x86_64-pc-linux-gnu' 'CXX=g++ -std=c++14' 'CXXFLAGS=-g' 'LDFLAGS= '; fi
+	if test -x $@; then ./$@ -recheck; else $<  '--srcdir=../../src/libcody' '--cache-file=./config.cache' '--prefix=/home/skim499/gcc-custom-pass/install' '--disable-bootstrap' '--enable-languages=c,c++,lto' '--program-transform-name=s,y,y,' '--disable-option-checking' '--disable-year2038' '--build=x86_64-pc-linux-gnu' '--host=x86_64-pc-linux-gnu' '--target=x86_64-pc-linux-gnu' 'build_alias=x86_64-pc-linux-gnu' 'host_alias=x86_64-pc-linux-gnu' 'target_alias=x86_64-pc-linux-gnu' 'CXX=g++' 'CXXFLAGS=-g -O2    ' 'LDFLAGS= '; fi
 
 mostlyclean::
 

@@ -874,7 +874,7 @@ BACKTRACE_SUPPORTS_THREADS = 1
 BACKTRACE_USES_MALLOC = 0
 CC = gcc
 CET_HOST_FLAGS = 
-CFLAGS = -g
+CFLAGS = -g -O2    
 CLOCK_GETTIME_LINK = 
 COMM = comm
 CPP = gcc -E
@@ -907,7 +907,7 @@ LIPO =
 LN_S = ln -s
 LTLIBOBJS = 
 MAINT = #
-MAKEINFO = /home/skim499/gcc-custom-pass/src/missing makeinfo --split-size=5000000 --split-size=5000000
+MAKEINFO = /home/skim499/gcc-custom-pass/src/missing makeinfo --split-size=5000000
 MKDIR_P = /usr/bin/mkdir -p
 NM = /usr/bin/nm -B
 NMEDIT = 
